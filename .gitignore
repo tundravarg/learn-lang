@@ -1,0 +1,14 @@
+*.swp
+*~
+\#*\#
+
+# Idea
+.idea
+make.js.iml
+config.yml
+
+# VSCode, Eclipse
+.project
+.classpath
+.settings
+.DS_Store
