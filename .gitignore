@@ -7,8 +7,11 @@
 make.js.iml
 config.yml
 
-# VSCode, Eclipse
+# VSCode
+.vscode/
+.DS_Store
+
+# Eclipse
 .project
 .classpath
 .settings
-.DS_Store
