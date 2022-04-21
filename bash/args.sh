@@ -16,14 +16,14 @@ function print_unknown {
 }
 
 function print_result {
-  echo HELP: $HELP
-  if [[ $HELP == "Y" ]]; then
-    print_help
-    return 1
-  fi
   echo SRC: $SRC
   echo DST: $DST
   echo AUX: ${AUX[@]}
+  echo HELP: $HELP
+  if [[ $HELP == "Y" ]]; then
+      print_help
+      return 1
+    fi
 }
 
 function print_args {
@@ -140,6 +140,36 @@ function args_space_or_eq {
 }
 
 
+##
+# Parse arguments with parameters separated by space or =
+#
+function args_getopts {
+  AUX=()
+  HELP=N
+  SRC=
+  DST=
+
+  OPTIND=1
+  while getopts ":hi:o:" a; do
+    case $a in
+      i|input)
+        SRC=$OPTARG
+        ;;
+      o|output)
+        DST=$OPTARG
+        ;;
+      h|help)
+        HELP=Y
+        ;;
+      *)
+        print_unknown "${*:$OPTIND-1:1}"
+        HELP=Y
+        ;;
+    esac
+  done
+}
+
+
 function test {
   NAME=$1
   FUNC=$2
@@ -163,6 +193,10 @@ function test_args_space_or_eq {
   test "Args with spaces" "args_space_or_eq" $*
 }
 
+function test_args_getopts {
+  test "Args with spaces" "args_getopts" $*
+}
+
 
 #test_args_spaces -i Input A1 --output Output A2 A3
 #test_args_spaces -i Input A1 --output=Output A2 A3
@@ -176,8 +210,10 @@ function test_args_space_or_eq {
 #test_args_eq --help
 #test_args_eq -a A --Bbb B --Ccc=C
 
-test_args_space_or_eq -i=Input A1 --output=Output A2 A3
-test_args_space_or_eq -i Input A1 --output=Output A2 A3
+#test_args_space_or_eq -i=Input A1 --output=Output A2 A3
+#test_args_space_or_eq -i Input A1 --output=Output A2 A3
 #test_args_space_or_eq -h
 #test_args_space_or_eq --help
 #test_args_space_or_eq -a A --Bbb B --Ccc=C
+
+test_args_getopts -i Input -e -o=Output -- A1 A2 A3
