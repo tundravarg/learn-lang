@@ -31,6 +31,44 @@ function print_args {
 }
 
 
+##
+# Parse arguments with parameters separated by spaces
+#
+function args_spaces {
+  AUX=()
+  HELP=N
+  SRC=
+  DST=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -i|--input)
+        SRC=$2
+        shift
+        shift
+        ;;
+      -o|--output)
+        DST=$2
+        shift
+        shift
+        ;;
+      -h|--help)
+        HELP=Y
+        shift
+        ;;
+      --*|-*)
+        print_unknown $1
+        HELP=Y
+        shift
+        ;;
+      *)
+        AUX+=("$1")
+        shift
+        ;;
+    esac
+  done
+}
+
+
 function test {
   NAME=$1
   FUNC=$2
@@ -42,5 +80,12 @@ function test {
   echo "---- End ----"
 }
 
+function test_args_spaces {
+  test "Args with spaces" "args_spaces" $*
+}
 
-test "Echo" "echo Echo: " -i Input A1 --output Output A2 A3
+
+test_args_spaces -i Input A1 --output Output A2 A3
+test_args_spaces -h
+test_args_spaces --help
+test_args_spaces -a A --Bbb B
