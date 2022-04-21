@@ -100,6 +100,46 @@ function args_eq {
 }
 
 
+##
+# Parse arguments with parameters separated by space or =
+#
+function args_space_or_eq {
+  AUX=()
+  HELP=N
+  SRC=
+  DST=
+  for (( i=1; i<=${#*}; i++ )); do
+    a=${@:$i:1}
+    case $a in
+      -i|--input)
+        ((i++))
+        SRC=${@:$i:1}
+        ;;
+      -i=*|--input=*)
+        SRC="${a#*=}"
+        ;;
+      -o|--output)
+        ((i++))
+        DST=${@:$i:1}
+        ;;
+      -o=*|--output=*)
+        DST="${a#*=}"
+        ;;
+      -h|--help)
+        HELP=Y
+        ;;
+      --*|-*)
+        print_unknown $a
+        HELP=Y
+        ;;
+      *)
+        AUX+=("$a")
+        ;;
+    esac
+  done
+}
+
+
 function test {
   NAME=$1
   FUNC=$2
@@ -119,6 +159,10 @@ function test_args_eq {
   test "Args with spaces" "args_eq" $*
 }
 
+function test_args_space_or_eq {
+  test "Args with spaces" "args_space_or_eq" $*
+}
+
 
 #test_args_spaces -i Input A1 --output Output A2 A3
 #test_args_spaces -i Input A1 --output=Output A2 A3
@@ -126,8 +170,14 @@ function test_args_eq {
 #test_args_spaces --help
 #test_args_spaces -a A --Bbb B --Ccc=C
 
-test_args_eq -i=Input A1 --output=Output A2 A3
-test_args_eq -i Input A1 --output=Output A2 A3
-test_args_eq -h
-test_args_eq --help
-test_args_eq -a A --Bbb B --Ccc=C
+#test_args_eq -i=Input A1 --output=Output A2 A3
+#test_args_eq -i Input A1 --output=Output A2 A3
+#test_args_eq -h
+#test_args_eq --help
+#test_args_eq -a A --Bbb B --Ccc=C
+
+test_args_space_or_eq -i=Input A1 --output=Output A2 A3
+test_args_space_or_eq -i Input A1 --output=Output A2 A3
+#test_args_space_or_eq -h
+#test_args_space_or_eq --help
+#test_args_space_or_eq -a A --Bbb B --Ccc=C
