@@ -4,8 +4,7 @@
 
 # Idea
 .idea
-make.js.iml
-config.yml
+*.iml
 
 # VSCode
 .vscode/
