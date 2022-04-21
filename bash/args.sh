@@ -69,6 +69,37 @@ function args_spaces {
 }
 
 
+##
+# Parse arguments with parameters separated by =
+#
+function args_eq {
+  AUX=()
+  HELP=N
+  SRC=
+  DST=
+  for a in "$@"; do
+    case $a in
+      -i=*|--input=*)
+        SRC="${a#*=}"
+        ;;
+      -o=*|--output=*)
+        DST="${a#*=}"
+        ;;
+      -h|--help)
+        HELP=Y
+        ;;
+      --*|-*)
+        print_unknown $a
+        HELP=Y
+        ;;
+      *)
+        AUX+=("$a")
+        ;;
+    esac
+  done
+}
+
+
 function test {
   NAME=$1
   FUNC=$2
@@ -84,8 +115,19 @@ function test_args_spaces {
   test "Args with spaces" "args_spaces" $*
 }
 
+function test_args_eq {
+  test "Args with spaces" "args_eq" $*
+}
 
-test_args_spaces -i Input A1 --output Output A2 A3
-test_args_spaces -h
-test_args_spaces --help
-test_args_spaces -a A --Bbb B
+
+#test_args_spaces -i Input A1 --output Output A2 A3
+#test_args_spaces -i Input A1 --output=Output A2 A3
+#test_args_spaces -h
+#test_args_spaces --help
+#test_args_spaces -a A --Bbb B --Ccc=C
+
+test_args_eq -i=Input A1 --output=Output A2 A3
+test_args_eq -i Input A1 --output=Output A2 A3
+test_args_eq -h
+test_args_eq --help
+test_args_eq -a A --Bbb B --Ccc=C
