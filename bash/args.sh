@@ -1,6 +1,11 @@
 #!/bin/bash
 
 
+#
+# See: https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+#
+
+
 function print_help {
   echo "Args <flags> <files>"
   echo "<flags>:"
@@ -20,14 +25,14 @@ function print_result {
   echo DST: $DST
   echo AUX: ${AUX[@]}
   echo HELP: $HELP
-  if [[ $HELP == "Y" ]]; then
-      print_help
-      return 1
-    fi
+  # if [[ $HELP == "Y" ]]; then
+  #   print_help
+  #   return 1
+  # fi
 }
 
 function print_args {
-  echo ARG: $*
+  echo ARGS: $*
 }
 
 
@@ -141,7 +146,8 @@ function args_space_or_eq {
 
 
 ##
-# Parse arguments with parameters separated by space or =
+# Parse arguments sing `getopts` shell built-in command
+# Supports only short options
 #
 function args_getopts {
   AUX=()
@@ -170,6 +176,60 @@ function args_getopts {
 }
 
 
+##
+# Parse arguments sing `getopt` programm
+# Not standartized, may be absent on some systems
+#
+function args_getopt {
+  AUX=()
+  HELP=N
+  SRC=
+  DST=
+
+  # Mac variant of `getopt`
+  # TODO: Linux variant of `getopt`
+  # Use $@ instead of $*
+  ARGS=$(getopt "hi:o:" "$@")
+  R=$?
+
+  if [ $R -ne 0 ]; then
+    echo "Errors while parsing arguments"
+    HELP=Y
+  fi
+
+  # Put $ARGS to positioning parameters
+  eval set -- "$ARGS"
+
+  while [ true ]; do
+    case $1 in
+      -i|--input)
+        SRC=$2
+        shift 2
+        ;;
+      -o|--output)
+        DST=$2
+        shift 2
+        ;;
+      -h|--help)
+        HELP=Y
+        shift
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        print_unknown "$1"
+        HELP=Y
+        shift
+        ;;
+    esac
+  done
+
+  AUX=${@:1}
+}
+
+
 function test {
   NAME=$1
   FUNC=$2
@@ -194,7 +254,11 @@ function test_args_space_or_eq {
 }
 
 function test_args_getopts {
-  test "Args with spaces" "args_getopts" $*
+  test "Args with getopts" "args_getopts" $*
+}
+
+function test_args_getopt {
+  test "Args with getopt" "args_getopt" $*
 }
 
 
@@ -216,4 +280,8 @@ function test_args_getopts {
 #test_args_space_or_eq --help
 #test_args_space_or_eq -a A --Bbb B --Ccc=C
 
-test_args_getopts -i Input -e -o=Output -- A1 A2 A3
+# test_args_getopts -i Input -oOutput -- A1 A2 A3
+# test_args_getopts -i=Input -e -o=Output -- A1 A2 A3
+
+test_args_getopt -i Input -oOutput -- A1 A2 A3
+test_args_getopt -i=Input -e -o=Output -- A1 A2 A3
