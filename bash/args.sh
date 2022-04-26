@@ -228,20 +228,18 @@ function args_getopts {
 # Not standartized, may be absent on some systems
 #
 function args_getopt {
-  AUX=()
-  HELP=N
-  SRC=
-  DST=
+  clear_args
+  RET=0
 
   # Mac variant of `getopt`
   # TODO: Linux variant of `getopt`
   # Use $@ instead of $*
-  ARGS=$(getopt "hi:o:" "$@")
+  ARGS=$(getopt "edi:o:k:h" "$@")
   R=$?
 
-  if [ $R -ne 0 ]; then
+  if (( $R )); then
     echo "Errors while parsing arguments"
-    HELP=Y
+    RET=1
   fi
 
   # Put $ARGS to positioning parameters
@@ -249,6 +247,14 @@ function args_getopt {
 
   while [ true ]; do
     case $1 in
+      -e|--encrypt)
+        ENC=Y
+        shift
+        ;;
+      -d|--decrypt)
+        DEC=Y
+        shift
+        ;;
       -i|--input)
         SRC=$2
         shift 2
@@ -257,8 +263,12 @@ function args_getopt {
         DST=$2
         shift 2
         ;;
+      -k|--key)
+        KEY=$2
+        shift 2
+        ;;
       -h|--help)
-        HELP=Y
+        HLP=Y
         shift
         ;;
       --)
@@ -267,13 +277,15 @@ function args_getopt {
         ;;
       *)
         print_unknown "$1"
-        HELP=Y
+        RET=1
         shift
         ;;
     esac
   done
 
   AUX=${@:1}
+
+  return $RET
 }
 
 
@@ -322,11 +334,14 @@ function test_args_getopt {
 # test_args_space_or_eq -h
 # test_args_space_or_eq -x
 
-test_args_getopts -i Input -oOutput -- A1 A2 A3
-test_args_getopts -i=Input -o=Output -- A1 A2 A3
-test_args_getopts -edh
-test_args_getopts -h
-test_args_getopts -X
+# test_args_getopts -i Input -oOutput -- A1 A2 A3
+# test_args_getopts -i=Input -o=Output -- A1 A2 A3
+# test_args_getopts -edh
+# test_args_getopts -h
+# test_args_getopts -X
 
-# test_args_getopt -i Input -oOutput -- A1 A2 A3
-# test_args_getopt -i=Input -e -o=Output -- A1 A2 A3
+test_args_getopt -i Input -oOutput -- A1 A2 A3
+test_args_getopt -i=Input -o=Output -- A1 A2 A3
+test_args_getopt -edh
+test_args_getopt -h
+test_args_getopt -X
