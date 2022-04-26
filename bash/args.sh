@@ -10,8 +10,11 @@ function print_help {
   echo "Args <flags> <files>"
   echo "<flags>:"
   echo "  -h --help            Print this help"
+  echo "  -e                   Encrypt"
+  echo "  -d                   Decrypt"
   echo "  -i --input <file>    Input file"
   echo "  -o --output <file>   Ouput file"
+  echo "  -k --key <file>      Key"
   echo "<files>:"
   echo "  *                    Auxiliary files"
 }
@@ -21,14 +24,22 @@ function print_unknown {
 }
 
 function print_result {
+  echo ENC: $ENC
+  echo DEC: $DEC
   echo SRC: $SRC
   echo DST: $DST
+  echo KEY: $KEY
   echo AUX: ${AUX[@]}
-  echo HELP: $HELP
-  # if [[ $HELP == "Y" ]]; then
-  #   print_help
-  #   return 1
-  # fi
+  echo HLP: $HLP
+  echo RET: $1
+  if [[ $HLP ]] || (( $RET )); then
+    print_help
+    if (( $RET )); then return $RET; fi
+  fi
+}
+
+function clear_args {
+  unset ENC DEC SRC DST KEY AUX HLP RET
 }
 
 function print_args {
@@ -40,29 +51,37 @@ function print_args {
 # Parse arguments with parameters separated by spaces
 #
 function args_spaces {
-  AUX=()
-  HELP=N
-  SRC=
-  DST=
+  clear_args
+  local RET=0
   while [[ $# -gt 0 ]]; do
     case $1 in
+      -e|--encrypt)
+        ENC=Y
+        shift
+        ;;
+      -d|--decrypt)
+        DEC=Y
+        shift
+        ;;
       -i|--input)
         SRC=$2
-        shift
-        shift
+        shift 2
         ;;
       -o|--output)
         DST=$2
-        shift
-        shift
+        shift 2
+        ;;
+      -k|--key)
+        DST=$2
+        shift 2
         ;;
       -h|--help)
-        HELP=Y
+        HLP=Y
         shift
         ;;
       --*|-*)
         print_unknown $1
-        HELP=Y
+        RET=1
         shift
         ;;
       *)
@@ -71,6 +90,7 @@ function args_spaces {
         ;;
     esac
   done
+  return $RET
 }
 
 
@@ -231,13 +251,14 @@ function args_getopt {
 
 
 function test {
-  NAME=$1
-  FUNC=$2
-  ARGS=${*:3}
+  local NAME=$1
+  local FUNC=$2
+  local ARGS=${*:3}
   echo "---- $NAME ----"
   print_args $ARGS
   $FUNC $ARGS
-  print_result
+  local RET=$?
+  print_result $RET && echo "DONE" || echo "ERROR"
   echo "---- End ----"
 }
 
@@ -262,11 +283,9 @@ function test_args_getopt {
 }
 
 
-#test_args_spaces -i Input A1 --output Output A2 A3
-#test_args_spaces -i Input A1 --output=Output A2 A3
-#test_args_spaces -h
-#test_args_spaces --help
-#test_args_spaces -a A --Bbb B --Ccc=C
+test_args_spaces -e -i Input A1 --output Output A2 A3
+test_args_spaces -h
+test_args_spaces -E A1 --Error A2 A3
 
 #test_args_eq -i=Input A1 --output=Output A2 A3
 #test_args_eq -i Input A1 --output=Output A2 A3
@@ -283,5 +302,5 @@ function test_args_getopt {
 # test_args_getopts -i Input -oOutput -- A1 A2 A3
 # test_args_getopts -i=Input -e -o=Output -- A1 A2 A3
 
-test_args_getopt -i Input -oOutput -- A1 A2 A3
-test_args_getopt -i=Input -e -o=Output -- A1 A2 A3
+# test_args_getopt -i Input -oOutput -- A1 A2 A3
+# test_args_getopt -i=Input -e -o=Output -- A1 A2 A3
