@@ -190,29 +190,36 @@ function args_space_or_eq {
 # Supports only short options
 #
 function args_getopts {
-  AUX=()
-  HELP=N
-  SRC=
-  DST=
-
+  clear_args
+  local RET=0
   OPTIND=1
-  while getopts ":hi:o:" a; do
+  while getopts ":edi:o:k:h" a; do
     case $a in
-      i|input)
+      e)
+        ENC=Y
+        ;;
+      d)
+        DEC=Y
+        ;;
+      i)
         SRC=$OPTARG
         ;;
-      o|output)
+      o)
         DST=$OPTARG
         ;;
-      h|help)
-        HELP=Y
+      k)
+        KEY=$OPTARG
+        ;;
+      h)
+        HLP=Y
         ;;
       *)
         print_unknown "${*:$OPTIND-1:1}"
-        HELP=Y
+        RET=1
         ;;
     esac
   done
+  return $RET
 }
 
 
@@ -307,16 +314,19 @@ function test_args_getopt {
 # test_args_spaces -h
 # test_args_spaces -E A1 --Error A2 A3
 
-test_args_eq -e -i=Input A1 --output=Output A2 A3
-test_args_eq -d -i=Input A1 --output=Output -k Key A2 A3
-test_args_eq -h
+# test_args_eq -e -i=Input A1 --output=Output A2 A3
+# test_args_eq -d -i=Input A1 --output=Output -k Key A2 A3
+# test_args_eq -h
 
-test_args_space_or_eq -e -i=Input A1 --output=Output -k Key A2 A3
-test_args_space_or_eq -h
-test_args_space_or_eq -x
+# test_args_space_or_eq -e -i=Input A1 --output=Output -k Key A2 A3
+# test_args_space_or_eq -h
+# test_args_space_or_eq -x
 
-# test_args_getopts -i Input -oOutput -- A1 A2 A3
-# test_args_getopts -i=Input -e -o=Output -- A1 A2 A3
+test_args_getopts -i Input -oOutput -- A1 A2 A3
+test_args_getopts -i=Input -o=Output -- A1 A2 A3
+test_args_getopts -edh
+test_args_getopts -h
+test_args_getopts -X
 
 # test_args_getopt -i Input -oOutput -- A1 A2 A3
 # test_args_getopt -i=Input -e -o=Output -- A1 A2 A3
