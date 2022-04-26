@@ -98,30 +98,38 @@ function args_spaces {
 # Parse arguments with parameters separated by =
 #
 function args_eq {
-  AUX=()
-  HELP=N
-  SRC=
-  DST=
+  clear_args
+  local RET=0
   for a in "$@"; do
     case $a in
+      -e|--encrypt)
+        ENC=Y
+        ;;
+      -d|--decrypt)
+        DEC=Y
+        ;;
       -i=*|--input=*)
         SRC="${a#*=}"
         ;;
       -o=*|--output=*)
         DST="${a#*=}"
         ;;
+      -k=*|--key=*)
+        DST="${a#*=}"
+        ;;
       -h|--help)
-        HELP=Y
+        HLP=Y
         ;;
       --*|-*)
         print_unknown $a
-        HELP=Y
+        RET=1
         ;;
       *)
         AUX+=("$a")
         ;;
     esac
   done
+  return $RET
 }
 
 
@@ -129,13 +137,17 @@ function args_eq {
 # Parse arguments with parameters separated by space or =
 #
 function args_space_or_eq {
-  AUX=()
-  HELP=N
-  SRC=
-  DST=
+  clear_args
+  local RET=0
   for (( i=1; i<=${#*}; i++ )); do
     a=${@:$i:1}
     case $a in
+      -e|--encrypt)
+        ENC=Y
+        ;;
+      -d|--decrypt)
+        DEC=Y
+        ;;
       -i|--input)
         ((i++))
         SRC=${@:$i:1}
@@ -150,18 +162,26 @@ function args_space_or_eq {
       -o=*|--output=*)
         DST="${a#*=}"
         ;;
+      -k|--key)
+        ((i++))
+        KEY=${@:$i:1}
+        ;;
+      -k=*|--key=*)
+        KEY="${a#*=}"
+        ;;
       -h|--help)
-        HELP=Y
+        HLP=Y
         ;;
       --*|-*)
         print_unknown $a
-        HELP=Y
+        RET=1
         ;;
       *)
         AUX+=("$a")
         ;;
     esac
   done
+  return $RET
 }
 
 
@@ -283,21 +303,17 @@ function test_args_getopt {
 }
 
 
-test_args_spaces -e -i Input A1 --output Output A2 A3
-test_args_spaces -h
-test_args_spaces -E A1 --Error A2 A3
+# test_args_spaces -e -i Input A1 --output Output A2 A3
+# test_args_spaces -h
+# test_args_spaces -E A1 --Error A2 A3
 
-#test_args_eq -i=Input A1 --output=Output A2 A3
-#test_args_eq -i Input A1 --output=Output A2 A3
-#test_args_eq -h
-#test_args_eq --help
-#test_args_eq -a A --Bbb B --Ccc=C
+test_args_eq -e -i=Input A1 --output=Output A2 A3
+test_args_eq -d -i=Input A1 --output=Output -k Key A2 A3
+test_args_eq -h
 
-#test_args_space_or_eq -i=Input A1 --output=Output A2 A3
-#test_args_space_or_eq -i Input A1 --output=Output A2 A3
-#test_args_space_or_eq -h
-#test_args_space_or_eq --help
-#test_args_space_or_eq -a A --Bbb B --Ccc=C
+test_args_space_or_eq -e -i=Input A1 --output=Output -k Key A2 A3
+test_args_space_or_eq -h
+test_args_space_or_eq -x
 
 # test_args_getopts -i Input -oOutput -- A1 A2 A3
 # test_args_getopts -i=Input -e -o=Output -- A1 A2 A3
