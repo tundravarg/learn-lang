@@ -52,7 +52,6 @@ function print_args {
 #
 function args_spaces {
   clear_args
-  local RET=0
   while [[ $# -gt 0 ]]; do
     case $1 in
       -e|--encrypt)
@@ -81,7 +80,7 @@ function args_spaces {
         ;;
       --*|-*)
         print_unknown $1
-        RET=1
+        local RET=1
         shift
         ;;
       *)
@@ -99,7 +98,6 @@ function args_spaces {
 #
 function args_eq {
   clear_args
-  local RET=0
   for a in "$@"; do
     case $a in
       -e|--encrypt)
@@ -122,7 +120,7 @@ function args_eq {
         ;;
       --*|-*)
         print_unknown $a
-        RET=1
+        local RET=1
         ;;
       *)
         AUX+=("$a")
@@ -138,7 +136,6 @@ function args_eq {
 #
 function args_space_or_eq {
   clear_args
-  local RET=0
   for (( i=1; i<=${#*}; i++ )); do
     a=${@:$i:1}
     case $a in
@@ -174,7 +171,7 @@ function args_space_or_eq {
         ;;
       --*|-*)
         print_unknown $a
-        RET=1
+        local RET=1
         ;;
       *)
         AUX+=("$a")
@@ -191,7 +188,6 @@ function args_space_or_eq {
 #
 function args_getopts {
   clear_args
-  local RET=0
   OPTIND=1
   while getopts ":edi:o:k:h" a; do
     case $a in
@@ -215,7 +211,7 @@ function args_getopts {
         ;;
       *)
         print_unknown "${*:$OPTIND-1:1}"
-        RET=1
+        local RET=1
         ;;
     esac
   done
@@ -229,7 +225,6 @@ function args_getopts {
 #
 function args_getopt {
   clear_args
-  RET=0
 
   # Mac variant of `getopt`
   # TODO: Linux variant of `getopt`
@@ -239,7 +234,7 @@ function args_getopt {
 
   if (( $R )); then
     echo "Errors while parsing arguments"
-    RET=1
+    local RET=1
   fi
 
   # Put $ARGS to positioning parameters
@@ -277,7 +272,7 @@ function args_getopt {
         ;;
       *)
         print_unknown "$1"
-        RET=1
+        local RET=1
         shift
         ;;
     esac
@@ -332,7 +327,7 @@ function test_args_getopt {
 
 # test_args_space_or_eq -e -i=Input A1 --output=Output -k Key A2 A3
 # test_args_space_or_eq -h
-# test_args_space_or_eq -x
+# test_args_space_or_eq -X
 
 # test_args_getopts -i Input -oOutput -- A1 A2 A3
 # test_args_getopts -i=Input -o=Output -- A1 A2 A3
