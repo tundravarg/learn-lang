@@ -3,6 +3,9 @@ package tuman.learn.java.model.util;
 
 import tuman.learn.java.model.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class LocationBuilder {
 
@@ -18,12 +21,23 @@ public class LocationBuilder {
             this.nextId = initial;
         }
 
-        public IdGenerator(Location root) {
-            this.nextId = findMaxId(0, root) + 1;
+        public IdGenerator(Location location) {
+            this.nextId = findMaxId(0, getRoot(location)) + 1;
         }
 
         public int next() {
             return nextId++;
+        }
+
+        private static Location getRoot(Location location) {
+            if (location == null) {
+                return null;
+            }
+            Location root = location;
+            while (root.getParent() != null) {
+                root = root.getParent();
+            }
+            return root;
         }
 
         private static int findMaxId(int maxId, Location location) {
@@ -73,19 +87,6 @@ public class LocationBuilder {
     }
 
 
-    public Location build() {
-        return root;
-    }
-
-    public Location getRoot() {
-        return root;
-    }
-
-    public Location getCurrent() {
-        return current;
-    }
-
-
     public LocationBuilder children() {
         checkCurrent();
         parent = current;
@@ -104,17 +105,22 @@ public class LocationBuilder {
         if (current == root) {
             children();
         }
+        checkParent();
         current = new Location();
         current.setId(nextId.next());
-        current.setParent(parent);
+        if (parent.getId() != null) {
+            current.setParent(parent);
+        }
         parent.getChildren().add(current);
         return this;
     }
+
 
     public LocationBuilder id() {
         checkCurrent();
         if (current.getId() == null) {
             current.setId(nextId.next());
+            current.getChildren().stream().forEach(c -> c.setParent(current));
         }
         return this;
     }
@@ -141,6 +147,27 @@ public class LocationBuilder {
         checkCurrent();
         current.setVolume(volume);
         return this;
+    }
+
+
+    public Location getRoot() {
+        return root;
+    }
+
+    public Location getCurrent() {
+        return current;
+    }
+
+    public List<Location> build() {
+        var locations = new ArrayList<Location>();
+        if (root.getId() != null) {
+            root.getChildren().stream().forEach(c -> c.setParent(root));
+            locations.add(root);
+        } else {
+            root.getChildren().stream().forEach(c -> c.setParent(null));
+            locations.addAll(root.getChildren());
+        }
+        return locations;
     }
 
 }

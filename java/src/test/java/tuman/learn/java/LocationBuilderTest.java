@@ -5,6 +5,8 @@ import org.junit.Test;
 import tuman.learn.java.model.Location;
 import tuman.learn.java.model.util.LocationBuilder;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static tuman.learn.java.util.AssertUtil.assertThrow;
 import static tuman.learn.java.util.AssertUtil.checkClassAndMessage;
@@ -16,7 +18,7 @@ public class LocationBuilderTest {
     public void testRoot() {
         var builder = new LocationBuilder();
 
-        var root = builder.build();
+        var root = builder.getRoot();
         assertClearLocation(root, false);
 
         assertNull(root.getId());
@@ -37,11 +39,17 @@ public class LocationBuilderTest {
     public void testSetters() {
         var builder = new LocationBuilder();
 
+        // Before first call `id()` on root, its `id` is `null`;
         var root = builder.getCurrent();
         assertNull(root.getId());
+        // First call `id()` sets `id` on root
+        builder.id();
+        assertEquals(1, root.getId().intValue());
+        // Next calls `id()` change nothing
         builder.id();
         assertEquals(1, root.getId().intValue());
 
+        // Fill Location properties
         var loc1 = builder.location()
                 .name("room-1")
                 .type(Location.Type.ROOM)
@@ -49,72 +57,89 @@ public class LocationBuilderTest {
                 .volume(12.5)
                 .getCurrent();
         assertLocation(loc1, 2, "room-1", Location.Type.ROOM, 5.0, 12.5);
+        // Call `id()` on non root does nothing
+        builder.id();
+        assertEquals(2, builder.getCurrent().getId().intValue());
 
+        // Fill another Location properties
         var loc2 = builder.location()
                 .name("zone-1")
                 .type(Location.Type.ZONE)
                 .area(2.0)
                 .volume(4.0)
                 .getCurrent();
-        assertLocation(loc1, 2, "room-1", Location.Type.ROOM, 5.0, 12.5);
         assertLocation(loc2, 3, "zone-1", Location.Type.ZONE, 2.0, 4.0);
+        // It doesn't change other nodes
+        assertLocation(loc1, 2, "room-1", Location.Type.ROOM, 5.0, 12.5);
     }
 
     @Test
     public void testBuild() {
         var builder = new LocationBuilder();
-        Location loc0 = builder.getCurrent();
-        Location loc1 = builder.location().getCurrent();
+
+        // Initial state.
         Location root = builder.getRoot();
-        Location built = builder.build();
+        // Root id must be null;
+        assertNull(root.getId());
 
-        assertClearLocation(loc0, false);
-        assertClearLocation(loc1, true);
-        assertClearLocation(root, false);
-        assertClearLocation(built, false);
+        // Add locations to root
+        // Don't need to call `children()` on root
+        builder .location()
+                .location();
+        assertEquals(2, root.getChildren().size());
+        assertEquals(1, root.getChildren().get(0).getId().intValue());
+        assertEquals(2, root.getChildren().get(1).getId().intValue());
 
-        assertEquals(built, root);
-        assertEquals(built, loc0);
-        assertNotEquals(built, loc1);
-    }
+        // If root has null id, build result is a list of added elements with no parent
+        List<Location> built = builder.build();
+        assertNotSame(root.getChildren(), built);
+        assertEquals(root.getChildren().size(), built.size());
+        assertSame(root.getChildren().get(0), built.get(0));
+        assertSame(root.getChildren().get(1), built.get(1));
+        // No parent if `root.id` is `null`
+        assertNull(built.get(0).getParent());
+        assertNull(built.get(1).getParent());
 
-    @Test
-    public void testOperations() {
-        var builder = new LocationBuilder();
+        // If root has non null id, build result is a list with one element - root
+        // Its children has non null link to parent, which is root element
+        root.setId(1000);
+        built = builder.build();
+        assertEquals(1, built.size());
+        assertSame(root, built.get(0));
+        // Parent is `root` if `root.id` is not `null`
+        assertSame(root, built.get(0).getChildren().get(0).getParent());
+        assertSame(root, built.get(0).getChildren().get(1).getParent());
+        // New elements has parent if its `id` is not `null`
+        assertSame(root, builder.location().getCurrent().getParent());
 
-        // Current is root initially
-        builder.name("A");
-        assertEquals("A", builder.getCurrent().getName());
+        Location loc1 = builder.getCurrent();
+        assertNotSame(loc1, root);
+        assertEquals(0, loc1.getChildren().size());
 
-        // Locations are added to current
-        Location cur = builder.getCurrent();
-        Location loc1 = builder.location().getCurrent();
-        Location loc2 = builder.location().getCurrent();
-        assertEquals(2, cur.getChildren().size());
-        assertNotEquals(loc1, loc2);
-        assertNotNull(loc1.getId());
-        assertNotNull(loc2.getId());
-        assertEquals(loc1.getId() + 1, loc2.getId().intValue());
-
-        // Children
-        cur = builder.getCurrent();
         builder.children();
+        // Can't set properties exactly after `children()`
         // No current at this moment
         assertThrow(() -> builder.name("A"), checkClassAndMessage(IllegalStateException.class, "No current"));
         assertThrow(() -> builder.type(Location.Type.ROOM), checkClassAndMessage(IllegalStateException.class, "No current"));
         assertThrow(() -> builder.area(1.0), checkClassAndMessage(IllegalStateException.class, "No current"));
         assertThrow(() -> builder.volume(1.0), checkClassAndMessage(IllegalStateException.class, "No current"));
-        // Add child location to current
-        loc1 = builder.location().name("A").type(Location.Type.ZONE).area(1.1).volume(2.2).getCurrent();
-        assertLocation(loc1, cur.getId() + 1, "A", Location.Type.ZONE, 1.1, 2.2);
-        assertEquals(1, cur.getChildren().size());
-        assertEquals(2, cur.getParent().getChildren().size());
 
-        // Parent
-        cur = builder.parent()
-                .location()
+        Location cur = builder.location()
+                .name("A")
+                .type(Location.Type.ZONE)
+                .area(1.1)
+                .volume(2.2)
                 .getCurrent();
-        assertEquals(3, );
+        assertLocation(cur, loc1.getId() + 1, "A", Location.Type.ZONE, 1.1, 2.2);
+        assertEquals(1, loc1.getChildren().size());
+        assertSame(loc1.getChildren().get(0), cur);
+        assertSame(loc1, cur.getParent());
+
+        builder.location();
+        assertEquals(2, loc1.getChildren().size());
+
+        cur = builder.parent().getCurrent();
+        assertSame(loc1, cur);
     }
 
 

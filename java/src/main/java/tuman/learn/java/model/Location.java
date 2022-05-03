@@ -1,7 +1,9 @@
 package tuman.learn.java.model;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -38,7 +40,7 @@ public class Location {
     private String name;
     private Type type;
     private Location parent;
-    private final Set<Location> children = new HashSet<>();
+    private final List<Location> children = new ArrayList<>();
     private double area;
     private double volume;
 
@@ -75,7 +77,7 @@ public class Location {
         this.parent = parent;
     }
 
-    public Set<Location> getChildren() {
+    public List<Location> getChildren() {
         return children;
     }
 
