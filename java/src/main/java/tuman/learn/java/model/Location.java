@@ -10,14 +10,24 @@ import java.util.Set;
 public class Location {
 
     public enum Type {
-        OTHER,
-        BUILDING,
-        FLOOR,
-        SECTION,
-        ROOM,
-        ZONE,
-        CABINET,
-        CONTAINER
+        OTHER("Other"),
+        BUILDING("Building"),
+        FLOOR("Floor"),
+        SECTION("Section"),
+        ROOM("Room"),
+        ZONE("Zone"),
+        CABINET("Cabinet"),
+        CONTAINER("Container");
+
+        private final String label;
+
+        Type(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
 

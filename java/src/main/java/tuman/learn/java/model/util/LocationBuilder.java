@@ -115,6 +115,10 @@ public class LocationBuilder {
         return this;
     }
 
+    public LocationBuilder location(Location.Type type, String name) {
+        return location().type(type).name(name);
+    }
+
 
     public LocationBuilder id() {
         checkCurrent();
