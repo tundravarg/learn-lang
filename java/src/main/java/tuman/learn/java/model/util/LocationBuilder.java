@@ -3,9 +3,6 @@ package tuman.learn.java.model.util;
 
 import tuman.learn.java.model.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class LocationBuilder {
 
@@ -45,8 +42,8 @@ public class LocationBuilder {
     }
 
 
-    private IdGenerator nextId;
-    private Location root;
+    private final IdGenerator nextId;
+    private final Location root;
     private Location current;
     private Location parent;
 
@@ -56,9 +53,8 @@ public class LocationBuilder {
     }
 
     public LocationBuilder(Location root) {
-
-        this.nextId = new IdGenerator(this.root);
         this.root = root != null ? root : new Location();
+        this.nextId = new IdGenerator(root);
         this.current = this.root;
         this.parent = null;
     }

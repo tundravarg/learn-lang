@@ -38,7 +38,7 @@ public class Location {
     private String name;
     private Type type;
     private Location parent;
-    private Set<Location> children = new HashSet<>();
+    private final Set<Location> children = new HashSet<>();
     private double area;
     private double volume;
 
