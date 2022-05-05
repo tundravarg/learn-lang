@@ -4,6 +4,7 @@ package tuman.learn.java;
 import tuman.learn.java.model.Location;
 import tuman.learn.java.model.util.LocationBuilder;
 import tuman.learn.java.model.util.LocationPrinter;
+import tuman.learn.java.utils.TestRun;
 
 
 public class LearnStream {
@@ -17,36 +18,40 @@ public class LearnStream {
     private void aggregation() {
         Location house = buildHouse();
 
-        Location flat1 = house.getChildren().get(0).getChildren().get(0);
-        LocationPrinter.stdOut(flat1);
+        TestRun.run("Flat Area", () -> {
+            Location flat1 = house.getChildren().get(0).getChildren().get(0);
+            LocationPrinter.stdOut(flat1);
 
-        // Get Flat area
-        double flat1Area = flat1.getChildren().stream()
-                .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
-        System.out.println("Flat 1 area: " + flat1Area);
-        assert flat1Area == 40.0;
+            // Get Flat area
+            double flat1Area = flat1.getChildren().stream()
+                    .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
+            System.out.println("Flat 1 area: " + flat1Area);
+            assert flat1Area == 40.0;
+        });
 
-        Location floor1 = house.getChildren().get(0);
-        LocationPrinter.stdOut(floor1);
+        TestRun.run("Floor Area", () -> {
+            Location floor1 = house.getChildren().get(0);
+            LocationPrinter.stdOut(floor1);
 
-        // Get Floor area by sum of Flats areas
-        double floor1Area1 = floor1.getChildren().stream()
-                // Flat Area
-                .map(flat -> flat.getChildren().stream()
-                    .reduce(0.0, (a, r) -> a + r.getArea(), Double::sum))
-                // Sum areas
-                .reduce(0.0, Double::sum);
-        System.out.println("Floor 1 area: " + floor1Area1);
-        assert floor1Area1 == 40.0 + 34 + 22 + 34 + 50;
+            // Get Floor area by sum of Flats areas
+            double floor1Area1 = floor1.getChildren().stream()
+                    // Flat Area
+                    .map(flat -> flat.getChildren().stream()
+                            .reduce(0.0, (a, r) -> a + r.getArea(), Double::sum))
+                    // Sum areas
+                    .reduce(0.0, Double::sum);
+            System.out.println("Floor 1 area: " + floor1Area1);
+            assert floor1Area1 == 40.0 + 34 + 22 + 34 + 50;
 
-        // Get Floor ara by sum of Rooms in Flats areas
-        double floor1Area2 = floor1.getChildren().stream()
-                // Get Rooms in Flats
-                .flatMap(flat -> flat.getChildren().stream())
-                // Sum Rooms areas
-                .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
-        System.out.println("Floor 1 area: " + floor1Area2);
-        assert floor1Area2 == floor1Area1;
+            // Get Floor ara by sum of Rooms in Flats areas
+            double floor1Area2 = floor1.getChildren().stream()
+                    // Get Rooms in Flats
+                    .flatMap(flat -> flat.getChildren().stream())
+                    // Sum Rooms areas
+                    .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
+            System.out.println("Floor 1 area: " + floor1Area2);
+            assert floor1Area2 == floor1Area1;
+        });
     }
 
 
