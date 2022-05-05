@@ -74,6 +74,15 @@ public class LocationBuilder {
     }
 
 
+    public static LocationBuilder create() {
+        return new LocationBuilder();
+    }
+
+    public static LocationBuilder create(Location root) {
+        return new LocationBuilder(root);
+    }
+
+
     private void checkCurrent() {
         if (current == null) {
             throw new IllegalStateException("No current");
@@ -116,7 +125,22 @@ public class LocationBuilder {
     }
 
     public LocationBuilder location(Location.Type type, String name) {
-        return location().type(type).name(name);
+        return location().init(type, name);
+    }
+
+    public LocationBuilder location(Location.Type type, String name, double area, double volume) {
+        return location().init(type, name, area, volume);
+    }
+
+
+    public LocationBuilder init(Location.Type type, String name) {
+        checkCurrent();
+        return id().type(type).name(name);
+    }
+
+    public LocationBuilder init(Location.Type type, String name, double area, double volume) {
+        checkCurrent();
+        return init(type, name).area(area).volume(volume);
     }
 
 
