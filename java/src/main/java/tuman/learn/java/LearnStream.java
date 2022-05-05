@@ -10,7 +10,18 @@ public class LearnStream {
 
     public static void main(String[] args) {
         LearnStream learnStream = new LearnStream();
-        learnStream.buildHouse();
+        learnStream.aggregation();
+    }
+
+
+    private void aggregation() {
+        Location house = buildHouse();
+
+        Location flat1 = house.getChildren().get(0).getChildren().get(0);
+        LocationPrinter.stdOut(flat1);
+        double flat1Area = flat1.getChildren().stream()
+                .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
+        System.out.println("Flat 1 area: " + flat1Area);
     }
 
 
@@ -100,7 +111,7 @@ public class LearnStream {
                         .location(Location.Type.ROOM, "Room 3", 8.0, 0)
                         .parent()
                 .getRoot();
-        LocationPrinter.stdOut(house);
+//        LocationPrinter.stdOut(house);
         return house;
     }
 
