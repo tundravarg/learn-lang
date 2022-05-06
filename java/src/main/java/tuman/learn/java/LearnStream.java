@@ -6,19 +6,26 @@ import tuman.learn.java.model.util.LocationBuilder;
 import tuman.learn.java.model.util.LocationPrinter;
 import tuman.learn.java.utils.TestRun;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 
 public class LearnStream {
 
     public static void main(String[] args) {
         LearnStream learnStream = new LearnStream();
-        learnStream.aggregation();
+//        learnStream.reducion();
+        learnStream.grouping();
     }
 
 
-    private void aggregation() {
+    private void reducion() {
         Location house = buildHouse();
 
         TestRun.run("Flat Area", (name, out) -> {
+
             Location flat1 = house.getChildren().get(0).getChildren().get(0);
             LocationPrinter.print(flat1, out.getOutStream());
 
@@ -27,9 +34,11 @@ public class LearnStream {
                     .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
             out.out("Flat 1 area: %.1f", flat1Area);
             assert flat1Area == 40.0;
+
         });
 
         TestRun.run("Floor Area", (name, out) -> {
+
             Location floor1 = house.getChildren().get(0);
             LocationPrinter.print(floor1, out.getOutStream());
 
@@ -37,7 +46,7 @@ public class LearnStream {
             double floor1Area1 = floor1.getChildren().stream()
                     // Flat Area
                     .map(flat -> flat.getChildren().stream()
-                            .reduce(0.0, (a, r) -> a + r.getArea(), Double::sum))
+                        .reduce(0.0, (a, r) -> a + r.getArea(), Double::sum))
                     // Sum areas
                     .reduce(0.0, Double::sum);
             out.out("Floor 1 area: %.1f", floor1Area1);
@@ -51,6 +60,46 @@ public class LearnStream {
                     .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
             out.out("Floor 1 area: %.1f", floor1Area2);
             assert floor1Area2 == floor1Area1;
+
+        });
+    }
+
+    private void grouping() {
+        Location house = buildHouse();
+
+        TestRun.run("Range Flats by number of Rooms", (name, out) -> {
+
+            final Predicate<Location> isLivingRoom = (room) -> room != null
+                    && room.getType() == Location.Type.ROOM
+                    && room.getName().toLowerCase().startsWith("room");
+            final Function<Location, Double> flatArea = (flat) -> flat.getChildren().stream()
+                    .filter(room -> room.getType() == Location.Type.ROOM)
+                    .reduce(0.0, (area, room) -> area + room.getArea(), Double::sum);
+
+            // Group Flats by number of Rooms
+            Map<Integer, List<Location>> flatsByNumberOfRooms = house
+                    .getChildren().stream() // Floors
+                    .flatMap(floor -> floor.getChildren().stream()) // Flats
+                    .collect(Collectors.groupingBy(flat ->
+                            (int)
+                                    flat.getChildren().stream()
+                                            .filter(isLivingRoom)
+                                            .count()
+                    ));
+            // Print Rooms in groups
+            out.out("Flats by number of separate living rooms:");
+            flatsByNumberOfRooms.entrySet().stream()
+                    .sorted(Comparator.comparing(Map.Entry::getKey))
+                    .forEach(flats -> {
+                        out.out("%d-room flats (%d):", flats.getKey(), flats.getValue().size());
+                        flats.getValue().stream()
+                                .sorted(Comparator.comparing(Location::getName))
+                                .forEach(flat -> out.out("  %s, %s floor, %.1f m",
+                                    flat.getName(),
+                                    flat.getParent().getName(),
+                                    flatArea.apply(flat)));
+                    });
+
         });
     }
 
@@ -79,7 +128,7 @@ public class LearnStream {
                     .location(Location.Type.SECTION, "Flat #3")
                         .children()
                         .location(Location.Type.ROOM, "Bathroom", 6.0, 0)
-                        .location(Location.Type.ROOM, "Room 1", 16.0, 0)
+                        .location(Location.Type.ROOM, "Hall", 16.0, 0)
                         .parent()
                     .location(Location.Type.SECTION, "Flat #4")
                         .children()
@@ -121,7 +170,7 @@ public class LearnStream {
                     .location(Location.Type.SECTION, "Flat #8")
                         .children()
                         .location(Location.Type.ROOM, "Bathroom", 6.0, 0)
-                        .location(Location.Type.ROOM, "Room 1", 16.0, 0)
+                        .location(Location.Type.ROOM, "Hall", 16.0, 0)
                         .parent()
                     .location(Location.Type.SECTION, "Flat #9")
                         .children()
