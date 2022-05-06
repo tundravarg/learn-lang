@@ -81,23 +81,23 @@ public class LearnStream {
                     .getChildren().stream() // Floors
                     .flatMap(floor -> floor.getChildren().stream()) // Flats
                     .collect(Collectors.groupingBy(flat ->
-                            (int)
-                                    flat.getChildren().stream()
-                                            .filter(isLivingRoom)
-                                            .count()
+                        (int)
+                        flat.getChildren().stream()
+                            .filter(isLivingRoom)
+                            .count()
                     ));
             // Print Rooms in groups
             out.out("Flats by number of separate living rooms:");
             flatsByNumberOfRooms.entrySet().stream()
-                    .sorted(Comparator.comparing(Map.Entry::getKey))
+                    .sorted(Map.Entry.comparingByKey())
                     .forEach(flats -> {
                         out.out("%d-room flats (%d):", flats.getKey(), flats.getValue().size());
                         flats.getValue().stream()
-                                .sorted(Comparator.comparing(Location::getName))
-                                .forEach(flat -> out.out("  %s, %s floor, %.1f m",
-                                    flat.getName(),
-                                    flat.getParent().getName(),
-                                    flatArea.apply(flat)));
+                            .sorted(Comparator.comparing(Location::getName))
+                            .forEach(flat -> out.out("  %s, %s floor, %.1f m",
+                                flat.getName(),
+                                flat.getParent().getName(),
+                                flatArea.apply(flat)));
                     });
 
         });
@@ -105,6 +105,7 @@ public class LearnStream {
 
 
     private static Location buildHouse() {
+        //noinspection UnnecessaryLocalVariable
         Location house = LocationBuilder.create()
                 .init(Location.Type.BUILDING, "House")
                 .location(Location.Type.FLOOR, "1")
