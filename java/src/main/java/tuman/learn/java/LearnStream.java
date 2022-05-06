@@ -11,6 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.javatuples.*;
+
 
 public class LearnStream {
 
@@ -86,7 +88,8 @@ public class LearnStream {
                             .filter(isLivingRoom)
                             .count()
                     ));
-            // Print Rooms in groups
+
+            // Print Flats in groups
             out.out("Flats by number of separate living rooms:");
             flatsByNumberOfRooms.entrySet().stream()
                     .sorted(Map.Entry.comparingByKey())
@@ -100,6 +103,21 @@ public class LearnStream {
                                 flatArea.apply(flat)));
                     });
 
+            // Print each Flat with number of Rooms
+            out.out("Number of separate living rooms:");
+            flatsByNumberOfRooms.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .flatMap(entry ->
+                        entry.getValue().stream()
+                        .map(flat -> Pair.with(entry.getKey(), flat))
+                    )
+                    .forEach(entry -> {
+                        out.out("%s, %s floor, %d rooms, %.1f m",
+                                entry.getValue1().getName(),
+                                entry.getValue1().getParent().getName(),
+                                entry.getValue0(),
+                                flatArea.apply(entry.getValue1()));
+                    });
         });
     }
 
