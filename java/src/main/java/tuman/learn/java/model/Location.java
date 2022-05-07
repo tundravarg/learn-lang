@@ -122,8 +122,28 @@ public class Location {
         return LocationSplitIterator.iterator(this);
     }
 
+    public LocationSplitIterator splitIterator(int depth) {
+        return LocationSplitIterator.iterator(this, depth);
+    }
+
     public Stream<Location> stream() {
         return LocationSplitIterator.stream(this);
+    }
+
+    public Stream<Location> stream(int depth) {
+        return LocationSplitIterator.stream(this, depth);
+    }
+
+    public int size() {
+        return size(-1);
+    }
+
+    public int size(int depth) {
+        if (depth == 0) {
+            return 1;
+        } else {
+            return 1 + children.stream().reduce(0, (size, child) -> size + child.size(depth - 1), Integer::sum);
+        }
     }
 
 }

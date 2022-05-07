@@ -12,11 +12,17 @@ import java.util.stream.StreamSupport;
 public class LocationSplitIterator implements Spliterator<Location> {
 
     private Location root;
+    private int maxDepth;
     private Stack<Iterator<Location>> levels = new Stack<>();
 
 
     public LocationSplitIterator(Location root) {
+        this(root, -1);
+    }
+
+    public LocationSplitIterator(Location root, int maxDepth) {
         this.root = root;
+        this.maxDepth = maxDepth >= 0 ? maxDepth : Integer.MAX_VALUE;
         this.levels.push(Collections.singletonList(root).iterator());
     }
 
@@ -31,7 +37,9 @@ public class LocationSplitIterator implements Spliterator<Location> {
         }
         Location current = levels.peek().next();
         consumer.accept(current);
-        levels.push(current.getChildren().iterator());
+        if (levels.size() <= maxDepth) {
+            levels.push(current.getChildren().iterator());
+        }
         return true;
     }
 
@@ -55,8 +63,16 @@ public class LocationSplitIterator implements Spliterator<Location> {
         return new LocationSplitIterator(root);
     }
 
+    public static LocationSplitIterator iterator(Location root, int depth) {
+        return new LocationSplitIterator(root, depth);
+    }
+
     public static Stream<Location> stream(Location root) {
         return StreamSupport.stream(iterator(root), false);
+    }
+
+    public static Stream<Location> stream(Location root, int depth) {
+        return StreamSupport.stream(iterator(root, depth), false);
     }
 
 }
