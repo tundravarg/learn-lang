@@ -80,6 +80,14 @@ public class LearnStream {
         assert min2 == min1;
         assert min3 == min1;
         assert min4 == min1;
+
+        List<Integer> evenNumbers = numberCollection.stream()
+                .filter(n -> n % 2 == 0)
+                .reduce(
+                    new ArrayList<Integer>(),
+                    (list, e) -> { list.add(e); return list; },
+                    (l1, l2) -> { l1.addAll(l2); return l1; });
+        System.out.printf("Event: %s\n", evenNumbers);
     }
 
 
