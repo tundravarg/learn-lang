@@ -58,10 +58,33 @@ public class Location {
 
     @Override
     public String toString() {
-        return String.format("%s #%d '%s', parent: %s, area: %.3f, volume: %.3f",
-                type, id, name,
-                parent != null ? "#" + parent.getId() : null,
-                area, volume);
+        return toString(true, true);
+    }
+
+    public String toShortString() {
+        return toString(false, false);
+    }
+
+    public String toString(boolean printParent, boolean printOther) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s #%d '%s'", type, id, name));
+        if (printParent) {
+            sb.append(String.format(", parent: %s", parent != null ? "#" + parent.getId() : null));
+        }
+        if (printOther) {
+            sb.append(String.format(", area: %.3f, volume: %.3f", area, volume));
+        }
+        return sb.toString();
+    }
+
+
+    public Location() {}
+
+
+    public Location init(Type type, String name) {
+        this.type = type;
+        this.name = name;
+        return this;
     }
 
 
@@ -134,6 +157,7 @@ public class Location {
         return LocationSplitIterator.stream(this, depth);
     }
 
+
     public int size() {
         return size(-1);
     }
@@ -144,6 +168,43 @@ public class Location {
         } else {
             return 1 + children.stream().reduce(0, (size, child) -> size + child.size(depth - 1), Integer::sum);
         }
+    }
+
+
+    public int depth() {
+        return depth(null);
+    }
+
+    public int depth(Location root) {
+        int depth = 0;
+        Location current = this;
+        while (current != null && current != root) {
+            depth++;
+            current = current.parent;
+        }
+
+        if (root == null) {
+            return depth - 1;
+        }
+        if (current == root) {
+            return depth;
+        }
+
+        depth = 0;
+        current = root;
+        while (current != null && current != this) {
+            depth--;
+            current = current.parent;
+        }
+
+        if (current == this) {
+            return depth;
+        }
+
+        throw new IllegalArgumentException(String.format(
+                "Locations %s and %s are not in same tree",
+                this.toShortString(),
+                root.toShortString()));
     }
 
 }
