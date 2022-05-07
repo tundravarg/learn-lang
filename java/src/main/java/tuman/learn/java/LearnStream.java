@@ -5,11 +5,13 @@ import org.javatuples.Pair;
 import tuman.learn.java.model.Location;
 import tuman.learn.java.model.util.LocationBuilder;
 import tuman.learn.java.model.util.LocationPrinter;
+import tuman.learn.java.utils.ObjectHolder;
 import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -68,18 +70,28 @@ public class LearnStream {
 
 
     private void reduction2() {
-        int[] numberArray = {0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89};
+        int[] numberArray = {-15, 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89};
         Collection<Integer> numberCollection = Arrays.stream(numberArray).boxed().collect(Collectors.toSet());
 
         int min1 = Arrays.stream(numberArray).min().getAsInt();
         int min2 = numberCollection.stream().min(Comparator.comparingInt(e -> e.intValue())).get();
+
         int min3 = Arrays.stream(numberArray).reduce(Integer.MAX_VALUE, (min, e) -> e < min ? e : min);
         int min4 = numberCollection.stream().reduce(Integer.MAX_VALUE, (min, e) -> e < min ? e : min);
 
-        System.out.printf("Min: %d, %d, %d, %d\n", min1, min2, min3, min4);
+        int min5 = numberCollection.stream()
+                .collect(Collector.of(
+                    () -> ObjectHolder.of(Integer.MAX_VALUE),
+                    (min, e) -> { if (e < min.get()) min.set(e); },
+                    (e1, e2) -> e1.get().intValue() < e2.get().intValue() ? e1 : e2
+                ))
+                .get();
+
+        System.out.printf("Min: %d, %d, %d, %d, %d\n", min1, min2, min3, min4, min5);
         assert min2 == min1;
         assert min3 == min1;
         assert min4 == min1;
+        assert min5 == min1;
 
         List<Integer> evenNumbers = numberCollection.stream()
                 .filter(n -> n % 2 == 0)
@@ -87,7 +99,15 @@ public class LearnStream {
                     new ArrayList<Integer>(),
                     (list, e) -> { list.add(e); return list; },
                     (l1, l2) -> { l1.addAll(l2); return l1; });
-        System.out.printf("Event: %s\n", evenNumbers);
+        System.out.printf("Even: %s\n", evenNumbers);
+
+        List<Integer> oddNumbers = numberCollection.stream()
+                .filter(n -> n % 2 == 1)
+                .collect(Collector.of(
+                    () -> new ArrayList<Integer>(),
+                    (list, e) -> list.add(e),
+                    (l1, l2) -> { l1.addAll(l2); return l1; }));
+        System.out.printf("Odd: %s\n", evenNumbers);
     }
 
 
