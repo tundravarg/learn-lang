@@ -1,6 +1,7 @@
 package tuman.learn.java;
 
 
+import org.javatuples.Pair;
 import tuman.learn.java.model.Location;
 import tuman.learn.java.model.util.LocationBuilder;
 import tuman.learn.java.model.util.LocationPrinter;
@@ -11,19 +12,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.javatuples.*;
-
 
 public class LearnStream {
 
     public static void main(String[] args) {
         LearnStream learnStream = new LearnStream();
-//        learnStream.reducion();
-        learnStream.grouping();
+//        learnStream.reduction1();
+        learnStream.reduction2();
+//        learnStream.grouping();
     }
 
 
-    private void reducion() {
+    private void reduction1() {
         Location house = buildHouse();
 
         TestRun.run("Flat Area", (name, out) -> {
@@ -65,6 +65,23 @@ public class LearnStream {
 
         });
     }
+
+
+    private void reduction2() {
+        int[] numberArray = {0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89};
+        Collection<Integer> numberCollection = Arrays.stream(numberArray).boxed().collect(Collectors.toSet());
+
+        int min1 = Arrays.stream(numberArray).min().getAsInt();
+        int min2 = numberCollection.stream().min(Comparator.comparingInt(e -> e.intValue())).get();
+        int min3 = Arrays.stream(numberArray).reduce(Integer.MAX_VALUE, (min, e) -> e < min ? e : min);
+        int min4 = numberCollection.stream().reduce(Integer.MAX_VALUE, (min, e) -> e < min ? e : min);
+
+        System.out.printf("Min: %d, %d, %d, %d\n", min1, min2, min3, min4);
+        assert min2 == min1;
+        assert min3 == min1;
+        assert min4 == min1;
+    }
+
 
     private void grouping() {
         Location house = buildHouse();
