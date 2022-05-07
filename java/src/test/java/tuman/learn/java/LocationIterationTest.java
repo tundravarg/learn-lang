@@ -20,6 +20,7 @@ public class LocationIterationTest extends TestCase {
             count++;
         }
 
+        System.out.printf("Size VS Count: %d, %d\n", fullSize, count);
         assertEquals(fullSize, count);
     }
 
@@ -44,6 +45,9 @@ public class LocationIterationTest extends TestCase {
                     return location;
                 })
                 .count();
+
+        System.out.printf("Depth: %d\n", DEPTH);
+        System.out.printf("Size VS Count: %d, %d\n", size, count);
         assertEquals(size, count);
     }
 
