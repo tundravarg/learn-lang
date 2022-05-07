@@ -1,10 +1,11 @@
 package tuman.learn.java.model;
 
 
+import tuman.learn.java.model.util.LocationSplitIterator;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 
 public class Location {
@@ -53,6 +54,15 @@ public class Location {
     private final List<Location> children = new ArrayList<>();
     private double area;
     private double volume;
+
+
+    @Override
+    public String toString() {
+        return String.format("%s #%d '%s', parent: %s, area: %.3f, volume: %.3f",
+                type, id, name,
+                parent != null ? "#" + parent.getId() : null,
+                area, volume);
+    }
 
 
     public Integer getId() {
@@ -105,6 +115,15 @@ public class Location {
 
     public void setVolume(double volume) {
         this.volume = volume;
+    }
+
+
+    public LocationSplitIterator splitIterator() {
+        return LocationSplitIterator.iterator(this);
+    }
+
+    public Stream<Location> stream() {
+        return LocationSplitIterator.stream(this);
     }
 
 }
