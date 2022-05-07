@@ -15,7 +15,11 @@ public class LocationPrinterTest {
 
     @Before
     public void init() {
-        root = new LocationBuilder()
+        root = createData();
+    }
+
+    public static Location createData() {
+        return LocationBuilder.create()
                 .id()
                 .type(Location.Type.SECTION)
                 .name("Flat #123")
