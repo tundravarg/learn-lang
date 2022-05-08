@@ -1,9 +1,6 @@
 package tuman.learn.java;
 
 
-import tuman.learn.java.utils.ObjectHolder;
-
-
 public class LearnGenerics {
 
     public static void main(String[] args) {
@@ -14,118 +11,158 @@ public class LearnGenerics {
 
     public void superAndExtends() {
         Holder<Object> holderOfObject = new Holder<>();
-        Holder<A> holderOfA = new Holder<>();
-        Holder<AA> holderOfAa = new Holder<>();
-        Holder<AAA> holderOfAaa = new Holder<>();
-        Holder<? super AA> holderOfAaSuper = new Holder<>();
-        Holder<? extends AA> holderOfAaExtent = new Holder<>();
+        Holder<A1> holderOfA1 = new Holder<>();
+        Holder<A2> holderOfA2 = new Holder<>();
+        Holder<A3> holderOfA3 = new Holder<>();
+        Holder<A4> holderOfA4 = new Holder<>();
+        Holder<A5> holderOfA5 = new Holder<>();
+        Holder<? super A3> holderOfA3Super = new Holder<>();
+        Holder<? extends A3> holderOfA3Extent = new Holder<>();
 
-        Object o   = new Object();
-        A   a   = new A();
-        AA  aa  = new AA();
-        AAA aaa = new AAA();
+        Object o = new Object();
+        A1 a1 = new A1();
+        A2 a2 = new A2();
+        A3 a3 = new A3();
+        A3 a4 = new A4();
+        A3 a5 = new A5();
 
         // Field
 
-//        holderOfAa.object = o; // Illegal
-//        holderOfAa.object = a; // Illegal
-        holderOfAa.object = aa;
-        holderOfAa.object = aaa;
+//        holderOfA3.object = o;  // Illegal
+//        holderOfA3.object = a1; // Illegal
+//        holderOfA3.object = a2; // Illegal
+        holderOfA3.object = a3;
+        holderOfA3.object = a4;
+        holderOfA3.object = a5;
 
-//        holderOfAaSuper.object = o; // Illegal
-//        holderOfAaSuper.object = a; // Illegal
-        holderOfAaSuper.object = aa;
-        holderOfAaSuper.object = aaa;
+//        holderOfA3Super.object = o;  // Illegal
+//        holderOfA3Super.object = a1; // Illegal
+//        holderOfA3Super.object = a2; // Illegal
+        holderOfA3Super.object = a3;
+        holderOfA3Super.object = a4;
+        holderOfA3Super.object = a5;
 
-//        holderOfAaExtent.object = o;   // Illegal
-//        holderOfAaExtent.object = a;   // Illegal
-//        holderOfAaExtent.object = aa;  // Illegal
-//        holderOfAaExtent.object = aaa; // Illegal
+//        holderOfA3Extent.object = o;  // Illegal
+//        holderOfA3Extent.object = a1; // Illegal
+//        holderOfA3Extent.object = a2; // Illegal
+//        holderOfA3Extent.object = a3; // Illegal
+//        holderOfA3Extent.object = a4; // Illegal
+//        holderOfA3Extent.object = a5; // Illegal
 
         // Set exact type
 
-//        holderOfAa.set(o); // Illegal
-//        holderOfAa.set(a); // Illegal
-        holderOfAa.set(aa);
-        holderOfAa.set(aaa);
+//        holderOfA3.set(o);  // Illegal
+//        holderOfA3.set(a1); // Illegal
+//        holderOfA3.set(a2); // Illegal
+        holderOfA3.set(a3);
+        holderOfA3.set(a4);
+        holderOfA3.set(a5);
 
-//        holderOfAaSuper.set(o); // Illegal
-//        holderOfAaSuper.set(a); // Illegal
-        holderOfAaSuper.set(aa);
-        holderOfAaSuper.set(aaa);
+//        holderOfA3Super.set(o);  // Illegal
+//        holderOfA3Super.set(a1); // Illegal
+//        holderOfA3Super.set(a2); // Illegal
+        holderOfA3Super.set(a3);
+        holderOfA3Super.set(a4);
+        holderOfA3Super.set(a5);
 
-//        holderOfAaExtent.set(o);   // Illegal
-//        holderOfAaExtent.set(a);   // Illegal
-//        holderOfAaExtent.set(aa);  // Illegal
-//        holderOfAaExtent.set(aaa); // Illegal
+//        holderOfA3Extent.set(o);  // Illegal
+//        holderOfA3Extent.set(a1); // Illegal
+//        holderOfA3Extent.set(a2); // Illegal
+//        holderOfA3Extent.set(a3); // Illegal
+//        holderOfA3Extent.set(a4); // Illegal
+//        holderOfA3Extent.set(a5); // Illegal
 
         // Set extent
 
-//        holderOfAa.setExtent(o); // Illegal
-//        holderOfAa.setExtent(a); // Illegal
-        holderOfAa.setExtent(aa);
-        holderOfAa.setExtent(aaa);
+//        holderOfA3.setExtent(o);  // Illegal
+//        holderOfA3.setExtent(a1); // Illegal
+//        holderOfA3.setExtent(a2); // Illegal
+        holderOfA3.setExtent(a3);
+        holderOfA3.setExtent(a4);
+        holderOfA3.setExtent(a5);
 
-//        holderOfAaSuper.setExtent(o); // Illegal
-//        holderOfAaSuper.setExtent(a); // Illegal
-        holderOfAaSuper.setExtent(aa);
-        holderOfAaSuper.setExtent(aaa);
+//        holderOfA3Super.setExtent(o);  // Illegal
+//        holderOfA3Super.setExtent(a1); // Illegal
+//        holderOfA3Super.setExtent(a2); // Illegal
+        holderOfA3Super.setExtent(a3);
+        holderOfA3Super.setExtent(a4);
+        holderOfA3Super.setExtent(a5);
 
-//        holderOfAaExtent.setExtent(o); // Illegal
-//        holderOfAaExtent.setExtent(a); // Illegal
-//        holderOfAaExtent.setExtent(aa); // Illegal
-//        holderOfAaExtent.setExtent(aaa); // Illegal
+//        holderOfA3Extent.setExtent(o);  // Illegal
+//        holderOfA3Extent.setExtent(a1); // Illegal
+//        holderOfA3Extent.setExtent(a2); // Illegal
+//        holderOfA3Extent.setExtent(a3); // Illegal
+//        holderOfA3Extent.setExtent(a4); // Illegal
+//        holderOfA3Extent.setExtent(a5); // Illegal
 
         // Set exact holder
 
-//        holderOfAa.set(holderOfObject);
-//        holderOfAa.set(holderOfA);
-        holderOfAa.set(holderOfAa);
-//        holderOfAa.set(holderOfAaa);
+//        holderOfA3.set(holderOfObject); // Illegal
+//        holderOfA3.set(holderOfA1); // Illegal
+//        holderOfA3.set(holderOfA2); // Illegal
+        holderOfA3.set(holderOfA3);
+//        holderOfA3.set(holderOfA4); // Illegal
+//        holderOfA3.set(holderOfA5); // Illegal
 
-//        holderOfAaSuper.set(holderOfObject);
-//        holderOfAaSuper.set(holderOfA);
-//        holderOfAaSuper.set(holderOfAa);
-//        holderOfAaSuper.set(holderOfAaa);
+//        holderOfA3Super.set(holderOfObject); // Illegal
+//        holderOfA3Super.set(holderOfA1); // Illegal
+//        holderOfA3Super.set(holderOfA2); // Illegal
+//        holderOfA3Super.set(holderOfA3); // Illegal
+//        holderOfA3Super.set(holderOfA4); // Illegal
+//        holderOfA3Super.set(holderOfA5); // Illegal
 
-//        holderOfAaExtent.set(holderOfObject);
-//        holderOfAaExtent.set(holderOfA);
-//        holderOfAaExtent.set(holderOfAa);
-//        holderOfAaExtent.set(holderOfAaa);
+//        holderOfA3Extent.set(holderOfObject); // Illegal
+//        holderOfA3Extent.set(holderOfA1); // Illegal
+//        holderOfA3Extent.set(holderOfA2); // Illegal
+//        holderOfA3Extent.set(holderOfA3); // Illegal
+//        holderOfA3Extent.set(holderOfA4); // Illegal
+//        holderOfA3Extent.set(holderOfA5); // Illegal
 
         // Set super holder
 
-        holderOfAa.setSuper(holderOfObject);
-        holderOfAa.setSuper(holderOfA);
-        holderOfAa.setSuper(holderOfAa);
-        holderOfAa.setSuper(holderOfAaa);
+        holderOfA3.setSuper(holderOfObject);
+        holderOfA3.setSuper(holderOfA1);
+        holderOfA3.setSuper(holderOfA2);
+        holderOfA3.setSuper(holderOfA3);
+//        holderOfA3.setSuper(holderOfA4); // Illegal
+//        holderOfA3.setSuper(holderOfA5); // Illegal
 
-        holderOfAaSuper.setSuper(holderOfObject);
-        holderOfAaSuper.setSuper(holderOfA);
-        holderOfAaSuper.setSuper(holderOfAa);
-        holderOfAaSuper.setSuper(holderOfAaa);
+        holderOfA3Super.setSuper(holderOfObject);
+//        holderOfA3Super.setSuper(holderOfA1); // Illegal
+//        holderOfA3Super.setSuper(holderOfA2); // Illegal
+//        holderOfA3Super.setSuper(holderOfA3); // Illegal
+//        holderOfA3Super.setSuper(holderOfA4); // Illegal
+//        holderOfA3Super.setSuper(holderOfA5); // Illegal
 
-        holderOfAaExtent.setSuper(holderOfObject);
-        holderOfAaExtent.setSuper(holderOfA);
-        holderOfAaExtent.setSuper(holderOfAa);
-        holderOfAaExtent.setSuper(holderOfAaa);
+        holderOfA3Extent.setSuper(holderOfObject);
+        holderOfA3Extent.setSuper(holderOfA1);
+        holderOfA3Extent.setSuper(holderOfA2);
+        holderOfA3Extent.setSuper(holderOfA3);
+//        holderOfA3Extent.setSuper(holderOfA4); // Illegal
+//        holderOfA3Extent.setSuper(holderOfA5); // Illegal
 
         // Set extent holder
 
-        holderOfAa.setExtent(holderOfObject);
-        holderOfAa.setExtent(holderOfA);
-        holderOfAa.setExtent(holderOfAa);
-        holderOfAa.setExtent(holderOfAaa);
+//        holderOfA3.setExtent(holderOfObject); // Illegal
+//        holderOfA3.setExtent(holderOfA1); // Illegal
+//        holderOfA3.setExtent(holderOfA2); // Illegal
+        holderOfA3.setExtent(holderOfA3);
+        holderOfA3.setExtent(holderOfA4);
+        holderOfA3.setExtent(holderOfA5);
 
-        holderOfAaSuper.setExtent(holderOfObject);
-        holderOfAaSuper.setExtent(holderOfA);
-        holderOfAaSuper.setExtent(holderOfAa);
-        holderOfAaSuper.setExtent(holderOfAaa);
+//        holderOfA3Super.setExtent(holderOfObject); // Illegal
+//        holderOfA3Super.setExtent(holderOfA1); // Illegal
+//        holderOfA3Super.setExtent(holderOfA2); // Illegal
+        holderOfA3Super.setExtent(holderOfA3);
+        holderOfA3Super.setExtent(holderOfA4);
+        holderOfA3Super.setExtent(holderOfA5);
 
-        holderOfAaExtent.setExtent(holderOfObject);
-        holderOfAaExtent.setExtent(holderOfA);
-        holderOfAaExtent.setExtent(holderOfAa);
-        holderOfAaExtent.setExtent(holderOfAaa);
+//        holderOfA3Extent.setExtent(holderOfObject); // Illegal
+//        holderOfA3Extent.setExtent(holderOfA1); // Illegal
+//        holderOfA3Extent.setExtent(holderOfA2); // Illegal
+//        holderOfA3Extent.setExtent(holderOfA3); // Illegal
+//        holderOfA3Extent.setExtent(holderOfA4); // Illegal
+//        holderOfA3Extent.setExtent(holderOfA5); // Illegal
     }
 
 }
@@ -162,20 +199,32 @@ class Holder <T> {
 }
 
 
-class A {
-    public void a() {
-        System.out.println("A");
+class A1 {
+    public void a1() {
+        System.out.println("A1");
     }
 }
 
-class AA extends A {
-    public void aa() {
-        System.out.println("A-A");
+class A2 extends A1 {
+    public void a2() {
+        System.out.println("A2");
     }
 }
 
-class AAA extends AA {
-    public void aaa() {
-        System.out.println("A-A-A");
+class A3 extends A2 {
+    public void a3() {
+        System.out.println("A3");
+    }
+}
+
+class A4 extends A3 {
+    public void a4() {
+        System.out.println("A4");
+    }
+}
+
+class A5 extends A4 {
+    public void a5() {
+        System.out.println("A5");
     }
 }
