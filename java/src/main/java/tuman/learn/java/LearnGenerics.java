@@ -13,9 +13,9 @@ public class LearnGenerics {
     }
 
     public void superAndExtends() {
-        ObjectHolder<AA> holderOfAa = new ObjectHolder<>();
-        ObjectHolder<? super AA> holderOfAaSuper = new ObjectHolder<>();
-        ObjectHolder<? extends AA> holderOfAaExtent = new ObjectHolder<>();
+        Holder<AA> holderOfAa = new Holder<>();
+        Holder<? super AA> holderOfAaSuper = new Holder<>();
+        Holder<? extends AA> holderOfAaExtent = new Holder<>();
 
 //        holderOfAa.set(new A()); // Illegal
         holderOfAa.set(new AA());
@@ -28,6 +28,17 @@ public class LearnGenerics {
 //        holderOfAaExtent.set(new A());   // Illegal
 //        holderOfAaExtent.set(new AA());  // Illegal
 //        holderOfAaExtent.set(new AAA()); // Illegal
+    }
+
+}
+
+
+class Holder <T> {
+
+    public T object;
+
+    public void set(T object) {
+        this.object = object;
     }
 
 }
