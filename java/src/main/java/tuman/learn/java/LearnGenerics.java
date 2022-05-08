@@ -17,6 +17,22 @@ public class LearnGenerics {
         Holder<? super AA> holderOfAaSuper = new Holder<>();
         Holder<? extends AA> holderOfAaExtent = new Holder<>();
 
+        // Field
+
+//        holderOfAa.object = new A(); // Illegal
+        holderOfAa.object = new AA();
+        holderOfAa.object = new AAA();
+
+//        holderOfAaSuper.object = new A(); // Illegal
+        holderOfAaSuper.object = new AA();
+        holderOfAaSuper.object = new AAA();
+
+//        holderOfAaExtent.object = new A();   // Illegal
+//        holderOfAaExtent.object = new AA();  // Illegal
+//        holderOfAaExtent.object = new AAA(); // Illegal
+
+        // Setter
+
 //        holderOfAa.set(new A()); // Illegal
         holderOfAa.set(new AA());
         holderOfAa.set(new AAA());
