@@ -49,17 +49,19 @@ public class LearnGenerics {
 //        holderOfAaExtent.set(aa);  // Illegal
 //        holderOfAaExtent.set(aaa); // Illegal
 
-//        holderOfAa.set(new A()); // Illegal
-        holderOfAa.set(new AA());
-        holderOfAa.set(new AAA());
+        // Set extent
 
-//        holderOfAaSuper.set(new A()); // Illegal
-        holderOfAaSuper.set(new AA());
-        holderOfAaSuper.set(new AAA());
+//        holderOfAa.setExtent(a); // Illegal
+        holderOfAa.setExtent(aa);
+        holderOfAa.setExtent(aaa);
 
-//        holderOfAaExtent.set(new A());   // Illegal
-//        holderOfAaExtent.set(new AA());  // Illegal
-//        holderOfAaExtent.set(new AAA()); // Illegal
+//        holderOfAaSuper.setExtent(a); // Illegal
+        holderOfAaSuper.setExtent(aa);
+        holderOfAaSuper.setExtent(aaa);
+
+//        holderOfAaExtent.setExtent(a); // Illegal
+//        holderOfAaExtent.setExtent(aa); // Illegal
+//        holderOfAaExtent.setExtent(aaa); // Illegal
     }
 
 }
@@ -70,6 +72,10 @@ class Holder <T> {
     public T object;
 
     public void set(T object) {
+        this.object = object;
+    }
+
+    public <E extends T> void setExtent(E object) {
         this.object = object;
     }
 
