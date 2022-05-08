@@ -30,6 +30,7 @@ public class LearnGenerics {
 
 
         // Set Concrete Holder
+        // Can set only exact type
 
 //        holderA3 = holderA2; // Illegal
         holderA3 = holderA3;
@@ -45,6 +46,7 @@ public class LearnGenerics {
 
 
         // Set Extent Holder
+        // Can set only type and subtype
 
 //        extentHolder3 = holderA2; // Illegal
         extentHolder3 = holderA3;
@@ -60,6 +62,7 @@ public class LearnGenerics {
 
 
         // Set Super Holder
+        // Can set only type and supertype
 
         superHolder3 = holderA2;
         superHolder3 = holderA3;
@@ -78,6 +81,7 @@ public class LearnGenerics {
 
         // `holderA3` can reference only to H<A3>, which can contain A3 and subclasses.
         // We can assign them here.
+
 //        holderA3.object = o;  // Illegal
 //        holderA3.object = a1; // Illegal
 //        holderA3.object = a2; // Illegal
@@ -88,6 +92,7 @@ public class LearnGenerics {
         // `holderA3` can reference only to H<A3>, which can contain A3 and subclasses, but not A2 and superclasses.
         // We can can access to members of A3 but not A4 ans subclasses, because we don't know, what is here.
         // We only can be sure, that here are at least A3.
+
         holderA3.object.hashCode();
         holderA3.object.a1();
         holderA3.object.a2();
@@ -102,6 +107,7 @@ public class LearnGenerics {
         // So we can't assign A2 and superclasses,
         // In other side, `extentHolder3` can contain H<A4>, H<A5>, etc, which can't contain H3, H4, etc.
         // So we can't assign anything here.
+
 //        extentHolder3.object = o;  // Illegal
 //        extentHolder3.object = a1; // Illegal
 //        extentHolder3.object = a2; // Illegal
@@ -112,6 +118,7 @@ public class LearnGenerics {
         // `extentHolder3` can reference to H<A3+>, which can contain A3 and subclasses.
         // It can reference To H<A4> or H<A5>, but we don't know this, we only know that here can be at least A3.
         // So we can call all methods from A3 ans superclasses.
+
         extentHolder3.object.hashCode();
         extentHolder3.object.a1();
         extentHolder3.object.a2();
@@ -124,6 +131,7 @@ public class LearnGenerics {
 
         // `superHolder3` can reference to H<A3->, which can contain only A3 and subclasses and can't contain A2 and superclasses.
         // So, we can set only A3 ans subclasses instances here.
+
 //        superHolder3.object = o;  // Illegal
 //        superHolder3.object = a1; // Illegal
 //        superHolder3.object = a2; // Illegal
@@ -135,6 +143,7 @@ public class LearnGenerics {
         // But we don't know, which A3 subclass is hold, so we can't call methods of A3 subclasses.
         // In other side, `superHolder3` can reference to H<A2>, so we can't call A3 methods.
         // As a result we can call only Object methods.
+
         superHolder3.object.hashCode();
 //        superHolder3.object.a1(); // Illegal
 //        superHolder3.object.a2(); // Illegal
