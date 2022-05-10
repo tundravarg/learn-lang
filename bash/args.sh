@@ -335,8 +335,8 @@ function test_args_getopt {
 # test_args_getopts -h
 # test_args_getopts -X
 
-test_args_getopt -i Input -oOutput -- A1 A2 A3
-test_args_getopt -i=Input -o=Output -- A1 A2 A3
+test_args_getopt -i Input -oOutput -k=Key -- A1 A2 A3
+test_args_getopt --input Input --output Output --key=Key -- A1 A2 A3
 test_args_getopt -edh
 test_args_getopt -h
 test_args_getopt -X
