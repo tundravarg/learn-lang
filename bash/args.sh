@@ -226,10 +226,17 @@ function args_getopts {
 function args_getopt {
   clear_args
 
-  # Mac variant of `getopt`
-  # TODO: Linux variant of `getopt`
-  # Use $@ instead of $*
-  ARGS=$(getopt "edi:o:k:h" "$@")
+  # # Mac variant of `getopt`
+  # # In Linux it also works, but here is extended variant (see below)
+  # # Use `$@` instead of `$*`
+  # ARGS=$(getopt "edi:o:k:h" "$@")
+
+  # Linux variant of `getopt`
+  # Here is two variants of command: simple and extended (see `man getopt`).
+  # Dont forget `--` before `$@`
+  # Use `$@` instead of `$*`
+  ARGS=$(getopt -o "edi:o:k:h" -l "encrypt,decrypt,input:,output:,key:,help" -- "$@")
+
   R=$?
 
   if (( $R )); then
@@ -338,5 +345,7 @@ function test_args_getopt {
 test_args_getopt -i Input -oOutput -k=Key -- A1 A2 A3
 test_args_getopt --input Input --output Output --key=Key -- A1 A2 A3
 test_args_getopt -edh
+test_args_getopt -ekKey
 test_args_getopt -h
+test_args_getopt --help
 test_args_getopt -X
