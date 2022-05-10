@@ -156,8 +156,92 @@ public class LearnGenerics {
 }
 
 
+class B1 {
+
+    public A3 getA() {
+        return new A3();
+    }
+
+    public void setA(A3 a) {
+        a.a3();
+    }
+
+    public Holder<A3> getAHolder() {
+        return new Holder<>(new A3());
+    }
+
+    public void setAHolder(Holder<A3> a) {
+        a.object.a3();
+    }
+
+    public void setASuperHolder(Holder<? super A3> a) {
+//        a.object.a3(); // Illegal;
+        a.object.hashCode();
+    }
+
+    public void setAExtentHolder(Holder<? extends A3> a) {
+        a.object.a3();
+    }
+
+}
+
+class B2 extends B1 {
+
+    @Override
+//    public A2 getA() { // Illegal: can't generalize returning type
+//    public A3 getA() { // OK
+    public A4 getA() {   // OK: can return more specific type
+        return new A4();
+    }
+
+    @Override
+//    public void setA(A2 a) { // Illegal
+//    public void setA(A4 a) { // Illegal
+    public void setA(A3 a) {   // OK
+        a.a2();
+    }
+
+    @Override
+//    public Holder<A2> getAHolder() { // Illegal
+//    public Holder<A4> getAHolder() { // Illegal
+    public Holder<A3> getAHolder() {   // OK
+        return null;
+    }
+
+    @Override
+//    public void setAHolder(Holder<A2> a) { // Illegal
+//    public void setAHolder(Holder<A4> a) { // Illegal
+    public void setAHolder(Holder<A3> a) {   // OK
+        a.object.a3();
+    }
+
+    @Override
+//    public void setASuperHolder(Holder<? super A2> a) { // Illegal
+//    public void setASuperHolder(Holder<? super A4> a) { // Illegal
+    public void setASuperHolder(Holder<? super A3> a) {   // OK
+        a.object.hashCode();
+    }
+
+    @Override
+//    public void setAExtentHolder(Holder<? extends A2> a) { // Illegal
+//    public void setAExtentHolder(Holder<? extends A4> a) { // Illegal
+    public void setAExtentHolder(Holder<? extends A3> a) {   // OK
+        a.object.a3();
+    }
+
+}
+
+
 class Holder <T> {
+
     public T object;
+
+    public Holder() {}
+
+    public Holder(T object) {
+        this.object = object;
+    }
+
 }
 
 
