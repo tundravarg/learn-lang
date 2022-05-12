@@ -1,12 +1,12 @@
-%   Streams
++   Streams
     +   reduce
-    %   grouping
-    -   Custom Collector
-    -   Custom stream
+    +   grouping
+    +   Custom Collector
+    +   Custom stream
 -   Collections
     -   Basic
     -   Thread safe
--   Generics: `extends` and `super`
++   Generics: `extends` and `super`
 -   Threads
     -   Classic
     -   New
