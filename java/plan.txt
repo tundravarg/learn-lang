@@ -1,16 +1,17 @@
+-   Threads
+    -   Classic
+    -   New
+    -   Future
+-   Collections
+    -   Basic
+    -   Thread safe
+-   IO, NIO
+-   HTTP
+-   Security
+
 +   Streams
     +   reduce
     +   grouping
     +   Custom Collector
     +   Custom stream
--   Collections
-    -   Basic
-    -   Thread safe
 +   Generics: `extends` and `super`
--   Threads
-    -   Classic
-    -   New
-    -   Future
--   IO, NIO
--   HTTP
--   Security
