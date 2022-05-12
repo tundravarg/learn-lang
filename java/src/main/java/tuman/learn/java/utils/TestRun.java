@@ -13,7 +13,7 @@ public class TestRun implements Runnable {
 
     public static class Out {
 
-        public void out(Object obj, Object... args) {
+        public synchronized void out(Object obj, Object... args) {
             if (obj instanceof String format && args.length > 0) {
                 System.out.printf(format, args);
                 System.out.println();
