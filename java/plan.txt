@@ -1,5 +1,5 @@
--   Threads
-    -   Classic
+%   Threads
+    %   Classic
     -   New
     -   Future
 -   Collections
