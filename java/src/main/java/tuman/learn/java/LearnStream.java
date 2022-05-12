@@ -9,19 +9,63 @@ import tuman.learn.java.utils.ObjectHolder;
 import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class LearnStream {
 
     public static void main(String[] args) {
+        System.out.println("==== Learn Streams ====");
         LearnStream learnStream = new LearnStream();
+
+        learnStream.generation();
 //        learnStream.reduction1();
-        learnStream.reduction2();
+//        learnStream.reduction2();
 //        learnStream.grouping();
+    }
+
+
+    private void generation() {
+        final IntConsumer printInt = e -> System.out.println(e);
+
+        TestRun.run("Concrete elements", (name, out) -> {
+            IntStream.of(3).forEach(printInt);
+            IntStream.of(7, 6, 2).forEach(printInt);
+        });
+
+        TestRun.run("Range Open", (name, out) -> {
+            IntStream.range(3, 7).forEach(printInt);
+        });
+
+        TestRun.run("Range Closed", (name, out) -> {
+            IntStream.rangeClosed(3, 7).forEach(printInt);
+        });
+
+        TestRun.run("Generate const", (name, out) -> {
+            IntStream.generate(() -> 1).limit(5).forEach(printInt);
+        });
+
+        TestRun.run("Generate fibo", (name, out) -> {
+            final int v[] = {0, 1};
+            IntStream.generate(() -> { int nv = v[0] + v[1]; v[0] = v[1]; v[1] = nv; return nv; })
+                    .limit(10)
+                    .forEach(printInt);
+        });
+
+        TestRun.run("Generate iterate", (name, out) -> {
+            IntStream.iterate(1, v -> v * 2)
+                    .limit(10)
+                    .forEach(printInt);
+        });
+
+        TestRun.run("Concat", (name, out) -> {
+            IntStream.concat(IntStream.of(1, 3, 5), IntStream.of(6, 4, 2))
+                    .sorted()
+                    .forEach(printInt);
+        });
     }
 
 
