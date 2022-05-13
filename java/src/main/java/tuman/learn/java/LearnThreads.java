@@ -16,7 +16,8 @@ public class LearnThreads {
         System.out.println("==== Learn Threads ====");
         LearnThreads learnThreads = new LearnThreads();
 
-        learnThreads.basicThreads();
+//        learnThreads.basicThreads();
+        learnThreads.restartThread();
     }
 
 
@@ -53,6 +54,24 @@ public class LearnThreads {
             out.out("Threads have finished");
 
             Arrays.stream(result).forEach(out::out);
+        });
+    }
+
+    private void restartThread() {
+        TestRun.run("Reuse Thread", (name, out) -> {
+            final var thread = new Thread(() -> {
+                out.out("Thread run");
+            });
+
+            out.out("Start 1");
+            thread.start();
+            MiscUtils.join(thread);
+            out.out("Finish 1");
+
+//            out.out("Start 2");
+//            thread.start();           // Illegal
+//            MiscUtils.join(thread);
+//            out.out("Finish 2");
         });
     }
 
