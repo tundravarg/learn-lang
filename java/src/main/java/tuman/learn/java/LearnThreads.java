@@ -4,12 +4,10 @@ package tuman.learn.java;
 import tuman.learn.java.utils.MiscUtils;
 import tuman.learn.java.utils.TestRun;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
@@ -21,7 +19,8 @@ public class LearnThreads {
 
 //        learnThreads.basicThreads();
 //        learnThreads.restartThread();
-        learnThreads.reuseThread();
+//        learnThreads.reuseThread();
+        learnThreads.priorities();
     }
 
 
@@ -108,6 +107,49 @@ public class LearnThreads {
             thread.addTask(task.apply("7", 1.0));
 
             MiscUtils.join(thread);
+
+        });
+    }
+
+    private void priorities() {
+        TestRun.run("Thread Priorities", (name, out) -> {
+
+            final var NUMBER_OF_THREADS = 5;
+            final var NUMBER_OF_ITERATIONS = 1000;
+            final int[] PRIORITIES = {5, 1, 5, 10, 5};
+
+            final Map<Integer, Integer> stats = new HashMap<>();
+            boolean[] finish = {false};
+            List<Thread> threads = IntStream.range(0, NUMBER_OF_THREADS).boxed()
+                    .map(ti -> {
+                        Thread thread = new Thread(() -> {
+                            l0: for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
+                                for (int j = 0; j < 1000000; j++) {
+                                    if (finish[0]) break l0;
+                                    Math.sin(i * j);
+                                }
+                                stats.compute(ti, (k, v) -> v != null ? v + 1 : 1);
+                            }
+                            finish[0] = true;
+                        });
+                        thread.setPriority(PRIORITIES[ti]);
+                        return thread;
+                    })
+                    .collect(Collectors.toList());
+
+            stats.clear();
+            finish[0] = false;
+            threads.forEach(Thread::start);
+            out.out("Start");
+
+            MiscUtils.join(threads);
+            out.out("Finish");
+
+            stats.entrySet().stream()
+                    .sorted(Comparator.comparing((Map.Entry<Integer, Integer> e) -> e.getValue()).reversed())
+                    .forEach(e -> out.out("%d (%d): %d", e.getKey(), PRIORITIES[e.getKey()], e.getValue()));
+
+            // TODO No correlation betwee priority and scores. Why?
 
         });
     }
