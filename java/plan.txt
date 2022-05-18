@@ -1,19 +1,25 @@
-%   Threads
-    %   Classic
-    -   New
-    -   Future
-    -   Misc
-        -   `sleep` precision
--   Collections
-    -   Basic
-    -   Thread safe
--   IO, NIO
--   HTTP
+%   Concurent
+	+	Classic
+	%	New
+	-	Future
+	-	Locks
+	-	Atomic
+	-	ForkJoin
+	-	Misc
+		-	`sleep` precision
+-	Collections
+	-	Basic
+	-	Thread safe
+-	IO, NIO
+-	HTTP
+	-	Basics
+	-	HTTPS
+	-	Authorization
 -   Security
 
-+   Streams
-    +   reduce
-    +   grouping
-    +   Custom Collector
-    +   Custom stream
-+   Generics: `extends` and `super`
++	Streams
+	+	reduce
+	+	grouping
+	+	Custom Collector
+	+	Custom stream
++	Generics: `extends` and `super`
