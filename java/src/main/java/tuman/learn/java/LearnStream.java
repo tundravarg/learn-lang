@@ -75,7 +75,7 @@ public class LearnStream {
         TestRun.run("Flat Area", (name, out) -> {
 
             Location flat1 = house.getChildren().get(0).getChildren().get(0);
-            LocationPrinter.print(flat1, out.getOutStream());
+            LocationPrinter.print(flat1, System.out);
 
             // Get Flat area
             double flat1Area = flat1.getChildren().stream()
@@ -88,7 +88,7 @@ public class LearnStream {
         TestRun.run("Floor Area", (name, out) -> {
 
             Location floor1 = house.getChildren().get(0);
-            LocationPrinter.print(floor1, out.getOutStream());
+            LocationPrinter.print(floor1, System.out);
 
             // Get Floor area by sum of Flats areas
             double floor1Area1 = floor1.getChildren().stream()
