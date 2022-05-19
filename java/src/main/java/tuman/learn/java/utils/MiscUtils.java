@@ -4,6 +4,8 @@ package tuman.learn.java.utils;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MiscUtils {
@@ -39,6 +41,36 @@ public class MiscUtils {
 
     public static boolean join(Thread... threads) {
         return join(Arrays.asList(threads));
+    }
+
+
+    public static boolean awaitTermination(ExecutorService executor, long timeout, TimeUnit timeUnit) {
+        try {
+            return executor.awaitTermination(timeout, timeUnit);
+        } catch (InterruptedException ex) {
+            return false;
+        }
+    }
+
+    public static boolean awaitTermination(ExecutorService executor) {
+        return awaitTermination(executor, 365, TimeUnit.DAYS);
+    }
+
+    public static boolean shutdownAndAwaitTermination(ExecutorService executor, boolean now, long timeout, TimeUnit timeUnit) {
+        if (now) {
+            executor.shutdownNow();
+        } else {
+            executor.shutdown();
+        }
+        return awaitTermination(executor, timeout, timeUnit);
+    }
+
+    public static boolean shutdownAndAwaitTermination(ExecutorService executor) {
+        return shutdownAndAwaitTermination(executor, false, 365, TimeUnit.DAYS);
+    }
+
+    public static boolean shutdownNowAndAwaitTermination(ExecutorService executor) {
+        return shutdownAndAwaitTermination(executor, true, 365, TimeUnit.DAYS);
     }
 
 }
