@@ -10,6 +10,20 @@ import java.util.concurrent.TimeUnit;
 
 public class MiscUtils {
 
+    private static final long NANOS_CORRECTION;
+    static {
+        long millis = System.currentTimeMillis();
+        long nanos = System.nanoTime();
+        NANOS_CORRECTION = (millis - nanos / 1000000) * 1000000;
+    }
+
+
+    public static long nanosInCurrentSecond() {
+        long nanos  = System.nanoTime() + NANOS_CORRECTION;
+        return nanos - nanos / 1000000000 * 1000000000;
+    }
+
+
     public static boolean sleep(long millis) {
         try {
             Thread.sleep(millis);
