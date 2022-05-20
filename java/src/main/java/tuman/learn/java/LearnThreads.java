@@ -6,6 +6,8 @@ import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,7 +22,8 @@ public class LearnThreads {
 //        learnThreads.basicThreads();
 //        learnThreads.restartThread();
 //        learnThreads.reuseThread();
-        learnThreads.priorities();
+//        learnThreads.priorities();
+        learnThreads.deadLock();
     }
 
 
@@ -151,6 +154,43 @@ public class LearnThreads {
 
             // TODO No correlation betwee priority and scores. Why?
 
+        });
+    }
+
+    private void deadLock() {
+        String l1 = "Lock-1";
+        String l2 = "Lock-2";
+
+        TestRun.run("Dead Lock", (name, out) -> {
+            final var fout = TestRun.DecoratedOut.withTimeAndThread(out);
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+            executor.execute(() -> {
+                fout.out("Locking %s", l1);
+                synchronized (l1) {
+                    fout.out("%s locked", l1);
+
+                    fout.out("Locking %s", l2);
+                    synchronized (l2) { // <------------------------ DEAD LOCK HERE
+                        fout.out("%s locked", l2);
+                    }
+                    fout.out("%s unlocked", l2);
+                }
+                fout.out("%s unlocked", l1);
+            });
+            executor.execute(() -> {
+                fout.out("Locking %s", l2);
+                synchronized (l2) {
+                    fout.out("%s locked", l2);
+
+                    fout.out("Locking %s", l1);
+                    synchronized (l1) { // <------------------------ DEAD LOCK HERE
+                        fout.out("%s locked", l1);
+                    }
+                    fout.out("%s unlocked", l1);
+                }
+                fout.out("%s unlocked", l2);
+            });
+            MiscUtils.shutdownAndAwaitTermination(executor);
         });
     }
 
