@@ -1,11 +1,15 @@
 %   Concurent
 	+	Classic
-	%	New
+		+	Dead lock
+		%	Synchronized
+		-	wait/notify
+	%	ExecutorService, Executors, etc.
 	-	Future
-	-	Locks
+	-	Locks (semaphore, mutex)
 	-	Atomic
 	-	ForkJoin
 	-	Misc
+		+	nano time and measurement
 		-	`sleep` precision
 -	Collections
 	-	Basic
