@@ -48,4 +48,19 @@ public class TestSleep extends TestCase {
         Assert.assertEquals(String.format("Result must be %b. Actual %s", expected, actual), expected, actual);
     }
 
+
+    public void testMeasure() {
+        final long T = 123; // ms
+
+        long callNothing = MiscUtils.measure(null);
+        long callEmpty = MiscUtils.measure(() -> {});
+        long callSleep = MiscUtils.measure(() -> MiscUtils.sleep(123));
+
+        System.out.printf("Call nothing: %d ns\n", callNothing);
+        System.out.printf("Call empty: %d ns\n", callEmpty);
+        System.out.printf("Call sleep %d ms: %d ns\n", T, callSleep);
+
+        AssertUtil.assertRange(T * 1000000, T * 1000000 + 100000, callSleep);
+    }
+
 }

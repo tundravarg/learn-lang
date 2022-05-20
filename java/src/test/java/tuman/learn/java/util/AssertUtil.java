@@ -63,4 +63,39 @@ public class AssertUtil {
         assertDurationWithDelta(duration, Math.round(duration * eps), run);
     }
 
+
+    public static <T extends Comparable> void assertRange(T expectedMin, T expectedMax, T actual) {
+        assertRange(expectedMin, true, expectedMax, true, actual);
+    }
+
+    public static <T extends Comparable> void assertRange(T expectedMin, boolean minInclusive, T expectedMax, boolean maxInclusive, T actual) {
+        boolean result;
+        if (actual != null) {
+            result = true;
+            if (expectedMin != null) {
+                result &= minInclusive ? expectedMin.compareTo(actual) <= 0 : expectedMin.compareTo(actual) < 0;
+            }
+            if (expectedMax != null) {
+                result &= maxInclusive ? expectedMax.compareTo(actual) >= 0 : expectedMax.compareTo(actual) > 0;
+            }
+        } else {
+            result = false;
+        }
+        Assert.assertTrue(
+                rangeMessage(actual, expectedMin, expectedMax, minInclusive, maxInclusive),
+                result);
+    }
+
+    private static String rangeMessage(
+            Object value,
+            Object min, Object max,
+            boolean minInclusive, boolean maxInclusive) {
+        return String.format("Value must be in range %s%s; %s%s. Actual is %s",
+                minInclusive ? "[" : "(",
+                min != null ? min : "*",
+                max != null ? max : "*",
+                maxInclusive ? "]" : ")",
+                value);
+    }
+
 }

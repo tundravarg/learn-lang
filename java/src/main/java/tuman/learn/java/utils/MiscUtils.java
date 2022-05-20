@@ -24,6 +24,21 @@ public class MiscUtils {
     }
 
 
+    /**
+     * Measure time of `run` execution
+     * @param run Function
+     * @return Time in nanoseconds
+     */
+    public static long measure(Runnable run) {
+        long t0 = System.nanoTime();
+        if (run != null) {
+            run.run();
+        }
+        long t1 = System.nanoTime();
+        return t1 - t0;
+    }
+
+
     public static boolean sleep(long millis) {
         try {
             Thread.sleep(millis);
