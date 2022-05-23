@@ -5,9 +5,7 @@ import tuman.learn.java.utils.MiscUtils;
 import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,7 +21,8 @@ public class LearnThreads {
 //        learnThreads.restartThread();
 //        learnThreads.reuseThread();
 //        learnThreads.priorities();
-        learnThreads.deadLock();
+//        learnThreads.deadLock();
+        learnThreads.synchronizedAccess();
     }
 
 
@@ -194,7 +193,144 @@ public class LearnThreads {
         });
     }
 
+    private void synchronizedAccess() {
+        TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Synchronized obj = new Synchronized();
+
+        TestRun.run("Call general and synchronized Methods", (name, out) -> {
+            try {
+                executor.invokeAll(Arrays.asList(
+                    (Callable<?>)
+                    () -> {
+                        // Call synchronized method
+                        obj.syncCall1(1.0);
+                        return null;
+                    },
+                    () -> {
+                        // General method calls while another synchronized one is in progress
+                        obj.asyncCall(0.3);
+                        obj.asyncCall(0.3);
+                        // Synchronized call while another synchronized one is in progress
+                        obj.syncCall2(0.3);
+                        return null;
+                    }
+                ));
+            } catch (InterruptedException ex) {}
+        });
+
+        TestRun.run("Call synchronized methods while object is in synchronized", (name, out) -> {
+            try {
+                executor.invokeAll(Arrays.asList(
+                    (Callable<?>)
+                    () -> {
+                        fout.out("BEGIN");
+                        MiscUtils.sleep(1.0);
+                        synchronized (obj) {
+                            fout.out("Sync: BEGIN");
+                            MiscUtils.sleep(3.0);
+                            fout.out("Sync: END");
+                        }
+                        MiscUtils.sleep(1.0);
+                        fout.out("END");
+                        return null;
+                    },
+                    () -> {
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+
+                        return null;
+                    }
+                ));
+            } catch (InterruptedException ex) {}
+        });
+
+        TestRun.run("Static synchronized", (name, out) -> {
+            try {
+                executor.invokeAll(Arrays.asList(
+                    (Callable<?>)
+                    () -> {
+                        fout.out("BEGIN");
+                        MiscUtils.sleep(1.0);
+                        synchronized (obj.getClass()) {
+                            fout.out("Sync: BEGIN");
+                            MiscUtils.sleep(3.0);
+                            fout.out("Sync: END");
+                        }
+                        MiscUtils.sleep(1.0);
+                        fout.out("END");
+                        return null;
+                    },
+                    () -> {
+                        // Class isn't synchronized yet
+                        obj.asyncCall(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.staticSyncCall(0.3);
+                        MiscUtils.sleep(0.1);
+
+                        // Class is synchronized, but object isn't
+                        obj.asyncCall(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.syncCall1(0.3);
+                        MiscUtils.sleep(0.1);
+                        obj.staticSyncCall(0.3);
+                        MiscUtils.sleep(0.1);
+
+                        return null;
+                    }
+                ));
+            } catch (InterruptedException ex) {}
+        });
+
+        executor.shutdown();
+    }
+
 }
+
+
+
+class Synchronized {
+
+    private static final TestRun.Out out = TestRun.DecoratedOut.withDateTimeAndThread(new TestRun.StdOut());
+
+    public void asyncCall(double duration) {
+        out.out("asyncCall: BEGIN");
+        MiscUtils.sleep(duration);
+        out.out("asyncCall: END");
+    }
+
+    public synchronized void syncCall1(double duration) {
+        out.out("syncCall1: BEGIN");
+        MiscUtils.sleep(duration);
+        out.out("syncCall1: END");
+    }
+
+    public synchronized void syncCall2(double duration) {
+        out.out("syncCall1: BEGIN");
+        MiscUtils.sleep(duration);
+        out.out("syncCall1: END");
+    }
+
+    public static synchronized void staticSyncCall(double duration) {
+        out.out("staticSyncCall1: BEGIN");
+        MiscUtils.sleep(duration);
+        out.out("staticSyncCall1: END");
+    }
+
+}
+
 
 
 class MultiRunThread extends Thread {

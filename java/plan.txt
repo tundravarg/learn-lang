@@ -1,7 +1,7 @@
 %   Concurent
 	+	Classic
 		+	Dead lock
-		%	Synchronized
+		+	Synchronized
 		-	wait/notify
 	%	ExecutorService, Executors, etc.
 	-	Future
