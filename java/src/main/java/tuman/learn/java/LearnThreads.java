@@ -314,7 +314,7 @@ public class LearnThreads {
                 List<Future<Integer>> result = executor.invokeAll(Arrays.asList(
                     () -> {
                         fout.out("Waiting...");
-                        synchronized (obj) {
+                        synchronized (obj) { // It is necessary to call `wait` having monitor
                             obj.wait();
                         }
                         fout.out("Notified");
@@ -324,7 +324,7 @@ public class LearnThreads {
                         fout.out("BEGIN");
                         MiscUtils.sleep(1.0);
                         fout.out("Notify...");
-                        synchronized (obj) {
+                        synchronized (obj) { // It is necessary to call `notify` having monitor
                             obj.notify();
                         }
                         fout.out("END");
@@ -332,19 +332,14 @@ public class LearnThreads {
                     }
                 ));
                 result.stream()
-                        .map(r -> {
-                            try {
-                                return r.get();
-                            } catch (InterruptedException | ExecutionException ex) {
-                                ex.printStackTrace();
-                                return ex;
-                            }
-                        })
+                        .map(MiscUtils::getResult)
                         .forEach(r -> out.out("Result: %s", r));
             } catch (InterruptedException ex) {
                 fout.out("INTERRUPTED: %s", ex);
             }
         });
+
+        executor.shutdown();
     }
 
 }

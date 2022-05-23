@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -100,6 +101,23 @@ public class MiscUtils {
 
     public static boolean shutdownNowAndAwaitTermination(ExecutorService executor) {
         return shutdownAndAwaitTermination(executor, true, 365, TimeUnit.DAYS);
+    }
+
+
+    public static <T, E extends Exception> Result<T, E> getResult(Future<T> future) {
+        try {
+            return (Result<T, E>)Result.value(future.get());
+        } catch (Exception ex) {
+            return (Result<T, E>)Result.error(ex);
+        }
+    }
+
+    public static <T, E extends Exception> Result<T, E> getResult(Future<T> future, long timeout, TimeUnit timeUnit) {
+        try {
+            return (Result<T, E>)Result.value(future.get(timeout, timeUnit));
+        } catch (Exception ex) {
+            return (Result<T, E>)Result.error(ex);
+        }
     }
 
 }
