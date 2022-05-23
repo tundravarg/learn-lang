@@ -22,7 +22,8 @@ public class LearnThreads {
 //        learnThreads.reuseThread();
 //        learnThreads.priorities();
 //        learnThreads.deadLock();
-        learnThreads.synchronizedAccess();
+//        learnThreads.synchronizedAccess();
+        learnThreads.awaitNotify();
     }
 
 
@@ -62,6 +63,7 @@ public class LearnThreads {
         });
     }
 
+
     private void restartThread() {
         TestRun.run("Restart Thread", (name, out) -> {
             final var thread = new Thread(() -> {
@@ -79,6 +81,7 @@ public class LearnThreads {
 //            out.out("Finish 2");
         });
     }
+
 
     private void reuseThread() {
         TestRun.run("Reuse Thread", (name, out) -> {
@@ -112,6 +115,7 @@ public class LearnThreads {
 
         });
     }
+
 
     private void priorities() {
         TestRun.run("Thread Priorities", (name, out) -> {
@@ -156,6 +160,7 @@ public class LearnThreads {
         });
     }
 
+
     private void deadLock() {
         String l1 = "Lock-1";
         String l2 = "Lock-2";
@@ -192,6 +197,7 @@ public class LearnThreads {
             MiscUtils.shutdownAndAwaitTermination(executor);
         });
     }
+
 
     private void synchronizedAccess() {
         TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
@@ -295,6 +301,50 @@ public class LearnThreads {
         });
 
         executor.shutdown();
+    }
+
+
+    public void awaitNotify() {
+        TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Object obj = new Object();
+
+        TestRun.run("Await and Notify", (name, out) -> {
+            try {
+                List<Future<Integer>> result = executor.invokeAll(Arrays.asList(
+                    () -> {
+                        fout.out("Waiting...");
+                        synchronized (obj) {
+                            obj.wait();
+                        }
+                        fout.out("Notified");
+                        return 1;
+                    },
+                    () -> {
+                        fout.out("BEGIN");
+                        MiscUtils.sleep(1.0);
+                        fout.out("Notify...");
+                        synchronized (obj) {
+                            obj.notify();
+                        }
+                        fout.out("END");
+                        return 2;
+                    }
+                ));
+                result.stream()
+                        .map(r -> {
+                            try {
+                                return r.get();
+                            } catch (InterruptedException | ExecutionException ex) {
+                                ex.printStackTrace();
+                                return ex;
+                            }
+                        })
+                        .forEach(r -> out.out("Result: %s", r));
+            } catch (InterruptedException ex) {
+                fout.out("INTERRUPTED: %s", ex);
+            }
+        });
     }
 
 }

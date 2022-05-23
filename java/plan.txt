@@ -1,8 +1,9 @@
 %   Concurent
-	+	Classic
+	%	Classic
 		+	Dead lock
 		+	Synchronized
-		-	wait/notify
+		+	wait/notify
+		-	volatile
 	%	ExecutorService, Executors, etc.
 	-	Future
 	-	Locks (semaphore, mutex)
