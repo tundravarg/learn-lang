@@ -310,33 +310,34 @@ public class LearnThreads {
         Object obj = new Object();
 
         TestRun.run("Await and Notify", (name, out) -> {
-            try {
-                List<Future<Integer>> result = executor.invokeAll(Arrays.asList(
-                    () -> {
-                        fout.out("Waiting...");
-                        synchronized (obj) { // It is necessary to call `wait` having monitor
-                            obj.wait();
+            List<Future<Integer>> results = Arrays.asList((Callable<Integer>)
+                        () -> {
+                            fout.out("Waiting...");
+                            synchronized (obj) { // It is necessary to call `wait` having monitor
+                                obj.wait();
+                            }
+                            fout.out("Notified");
+                            return 1;
+                        },
+                        () -> {
+                            fout.out("BEGIN");
+                            MiscUtils.sleep(1.0);
+                            fout.out("Notify...");
+                            synchronized (obj) { // It is necessary to call `notify` having monitor
+                                obj.notify();
+                            }
+                            fout.out("END");
+                            return 2;
                         }
-                        fout.out("Notified");
-                        return 1;
-                    },
-                    () -> {
-                        fout.out("BEGIN");
-                        MiscUtils.sleep(1.0);
-                        fout.out("Notify...");
-                        synchronized (obj) { // It is necessary to call `notify` having monitor
-                            obj.notify();
-                        }
-                        fout.out("END");
-                        return 2;
-                    }
-                ));
-                result.stream()
-                        .map(MiscUtils::getResult)
-                        .forEach(r -> out.out("Result: %s", r));
-            } catch (InterruptedException ex) {
-                fout.out("INTERRUPTED: %s", ex);
-            }
+                    ).stream()
+                    .map(executor::submit)
+                    .collect(Collectors.toList());
+            // It is important to collect Futures before streaming through them
+            //   because Stream tries to perform all operations for the first Callable, then for the second, ect.
+            //   As a result we will wait the first Callable result before the second one is started.
+            results.stream()
+                    .map(f -> MiscUtils.getResult(f, 5, TimeUnit.SECONDS))
+                    .forEach(r -> out.out("Result: %s", r));
         });
 
         executor.shutdown();
