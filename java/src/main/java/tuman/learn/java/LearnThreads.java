@@ -347,24 +347,52 @@ public class LearnThreads {
 
     public void volatileVariables() {
         TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
-        ExecutorService executor = Executors.newCachedThreadPool();
-        VolatileTest obj = new VolatileTest();
 
-        TestRun.run("Access to non-volatile variable", (name, out) -> {
-            executor.execute(() -> {
-                fout.out("a0: %d", obj.getA());
-                fout.out("op: %d", obj.op(0.5));
-            });
-            executor.execute(() -> {
-                fout.out("a0: %d", obj.getA());
-                fout.out("op: %d", obj.op(0.5));
-            });
-            // TODO I expected, that `op` calls return `1` and `2` values
-            // because threads must (may?) cache values.
-            // But no, the access to true variable value.
+        TestRun.run("Access to volatile and non-volatile variable", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incAB();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+            }
+            // TODO As we can see, `volatile` variable also isn't set to 100000. Why?..
         });
 
-        executor.shutdown();
+        TestRun.run("Access to volatile and non-volatile variable in sync method", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incABSync1();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+            }
+        });
+
+        TestRun.run("Access to volatile and non-volatile variable in sync block", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incABSync2();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+            }
+        });
     }
 
 }
@@ -374,19 +402,31 @@ public class LearnThreads {
 class VolatileTest {
 
     private int a = 0;
+    private volatile int b = 0;
 
     public int getA() {
         return a;
     }
 
-    public int op(double pause) {
+    public int getB() {
+        return b;
+    }
+
+
+    public void incAB() {
         a++;
+        b++;
+    }
+    public synchronized void incABSync1() {
+        a++;
+        b++;
+    }
 
-        for (int i = 0, n = (int)(pause * 10000000); i < n; i++) {
-            Math.log10(Math.sin(pause * n));
+    public synchronized void incABSync2() {
+        synchronized (this) {
+            a++;
+            b++;
         }
-
-        return a;
     }
 
 }
