@@ -23,7 +23,8 @@ public class LearnThreads {
 //        learnThreads.priorities();
 //        learnThreads.deadLock();
 //        learnThreads.synchronizedAccess();
-        learnThreads.awaitNotify();
+//        learnThreads.awaitNotify();
+        learnThreads.volatileVariables();
     }
 
 
@@ -341,6 +342,51 @@ public class LearnThreads {
         });
 
         executor.shutdown();
+    }
+
+
+    public void volatileVariables() {
+        TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
+        ExecutorService executor = Executors.newCachedThreadPool();
+        VolatileTest obj = new VolatileTest();
+
+        TestRun.run("Access to non-volatile variable", (name, out) -> {
+            executor.execute(() -> {
+                fout.out("a0: %d", obj.getA());
+                fout.out("op: %d", obj.op(0.5));
+            });
+            executor.execute(() -> {
+                fout.out("a0: %d", obj.getA());
+                fout.out("op: %d", obj.op(0.5));
+            });
+            // TODO I expected, that `op` calls return `1` and `2` values
+            // because threads must (may?) cache values.
+            // But no, the access to true variable value.
+        });
+
+        executor.shutdown();
+    }
+
+}
+
+
+
+class VolatileTest {
+
+    private int a = 0;
+
+    public int getA() {
+        return a;
+    }
+
+    public int op(double pause) {
+        a++;
+
+        for (int i = 0, n = (int)(pause * 10000000); i < n; i++) {
+            Math.log10(Math.sin(pause * n));
+        }
+
+        return a;
     }
 
 }

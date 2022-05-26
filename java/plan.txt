@@ -3,7 +3,7 @@
 		+	Dead lock
 		+	Synchronized
 		+	wait/notify
-		-	volatile
+		%	volatile
 	%	ExecutorService, Executors, etc.
 	-	Future
 	-	Locks (semaphore, mutex)
