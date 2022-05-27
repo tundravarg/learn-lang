@@ -6,6 +6,7 @@ import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -358,8 +359,10 @@ public class LearnThreads {
                     });
                 }
                 MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
                 out.out("A: %d", obj.getA());
                 out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
             }
             // TODO As we can see, `volatile` variable also isn't set to 100000. Why?..
         });
@@ -374,8 +377,10 @@ public class LearnThreads {
                     });
                 }
                 MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
                 out.out("A: %d", obj.getA());
                 out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
             }
         });
 
@@ -389,8 +394,10 @@ public class LearnThreads {
                     });
                 }
                 MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
                 out.out("A: %d", obj.getA());
                 out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
             }
         });
     }
@@ -404,6 +411,8 @@ class VolatileTest {
     private int a = 0;
     private volatile int b = 0;
 
+    private AtomicInteger c = new AtomicInteger(0);
+
     public int getA() {
         return a;
     }
@@ -412,20 +421,26 @@ class VolatileTest {
         return b;
     }
 
+    public int getC() {
+        return c.get();
+    }
 
     public void incAB() {
         a++;
         b++;
+        c.incrementAndGet();
     }
     public synchronized void incABSync1() {
         a++;
         b++;
+        c.incrementAndGet();
     }
 
     public synchronized void incABSync2() {
         synchronized (this) {
             a++;
             b++;
+            c.incrementAndGet();
         }
     }
 
