@@ -6,6 +6,7 @@ import tuman.learn.java.utils.TestRun;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,7 +24,8 @@ public class LearnThreads {
 //        learnThreads.priorities();
 //        learnThreads.deadLock();
 //        learnThreads.synchronizedAccess();
-        learnThreads.awaitNotify();
+//        learnThreads.awaitNotify();
+        learnThreads.volatileVariables();
     }
 
 
@@ -341,6 +343,105 @@ public class LearnThreads {
         });
 
         executor.shutdown();
+    }
+
+
+    public void volatileVariables() {
+        TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
+
+        TestRun.run("Access to volatile and non-volatile variable", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incAB();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
+            }
+            // TODO As we can see, `volatile` variable also isn't set to 100000. Why?..
+        });
+
+        TestRun.run("Access to volatile and non-volatile variable in sync method", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incABSync1();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
+            }
+        });
+
+        TestRun.run("Access to volatile and non-volatile variable in sync block", (name, out) -> {
+            for (int j = 0; j < 10; j++) {
+                ExecutorService executor = Executors.newCachedThreadPool();
+                VolatileTest obj = new VolatileTest();
+                for (int i = 0; i < 100000; i ++) {
+                    executor.execute(() -> {
+                        obj.incABSync2();
+                    });
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+                out.out("%d)", j + 1);
+                out.out("A: %d", obj.getA());
+                out.out("B: %d", obj.getB());
+                out.out("C: %d", obj.getC());
+            }
+        });
+    }
+
+}
+
+
+
+class VolatileTest {
+
+    private int a = 0;
+    private volatile int b = 0;
+
+    private AtomicInteger c = new AtomicInteger(0);
+
+    public int getA() {
+        return a;
+    }
+
+    public int getB() {
+        return b;
+    }
+
+    public int getC() {
+        return c.get();
+    }
+
+    public void incAB() {
+        a++;
+        b++;
+        c.incrementAndGet();
+    }
+    public synchronized void incABSync1() {
+        a++;
+        b++;
+        c.incrementAndGet();
+    }
+
+    public synchronized void incABSync2() {
+        synchronized (this) {
+            a++;
+            b++;
+            c.incrementAndGet();
+        }
     }
 
 }
