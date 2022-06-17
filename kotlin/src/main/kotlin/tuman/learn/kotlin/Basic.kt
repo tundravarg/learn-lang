@@ -1,3 +1,7 @@
+import tuman.learn.kotlin.utils.subtest
+import tuman.learn.kotlin.utils.test
+
+
 fun learnBasic() {
 //    learnVariables()
 //    learnBasicStatements()
@@ -237,43 +241,52 @@ private fun learnFunctions() {
 
 
 fun learnLambdas() {
-    println("-- Lambda --")
+    test("Lambda") {
 
-    val iadd: IntOp = { i0, i1 -> i0 + i1 }
-    val isub: IntOp = fun(i0, i1) = i0 - i1
-//    val imul: IntOp = { i1 -> this * i1}
+        subtest("Simple") {
 
-    println("12 + 5 = ${iadd.invoke(12, 5)}")
-    println("17 - 5 = ${isub(17, 5)}")
-
-    val imul: IntOp2 = { i1 -> this * i1 }
-    val idiv: IntOp2 = fun Int.(i1: Int): Int = this / i1
-
-    println("2 * 5 = ${imul(2, 5)}")
-    println("2 * 3 = ${2.imul(3)}")
-    println("9 / 2 = ${idiv(9, 2)}")
-    println("9 / 3 = ${9.idiv(3)}")
-
-    val iadd2: IntOp2 = iadd
-    val iadd3: IntOp = iadd2
-
-    println("2 + 6 = ${2.iadd2(6)}")
-    println("2 + 7 = ${iadd2(2, 7)}")
-//    println("2 + 8 = ${2.isum3(8)}")
-    println("2 + 9 = ${iadd3(2, 9)}")
-
-    fun log(name: String, op: IntOp): IntOp {
-        return { a, b ->
-            val r = op(a, b)
-            println("$a $name $b = $r")
-            r
+            val iadd: IntOp = { i0, i1 -> i0 + i1 }
+            val isub: IntOp = fun(i0, i1) = i0 - i1
+//            val imul: IntOp = { i1 -> this * i1}
+            println("12 + 5 = ${iadd.invoke(12, 5)}")
+            println("17 - 5 = ${isub(17, 5)}")
         }
-    }
 
-    log("plus", iadd)(5, 6)
-    log("minus", isub)(9, 3)
-    log("multiple", imul)(3, 5)
-    log("divide", idiv)(9, 3)
+        subtest("With Receiver") {
+            val imul: IntOp2 = { i1 -> this * i1 }
+            val idiv: IntOp2 = fun Int.(i1: Int): Int = this / i1
+            println("2 * 5 = ${imul(2, 5)}")
+            println("2 * 3 = ${2.imul(3)}")
+            println("9 / 2 = ${idiv(9, 2)}")
+            println("9 / 3 = ${9.idiv(3)}")
+        }
+
+        subtest("Compatibility") {
+            val iadd1: IntOp = { i0, i1 -> i0 + i1 }
+            val iadd2: IntOp2 = iadd1
+            val iadd3: IntOp = iadd2
+            println("2 + 6 = ${2.iadd2(6)}")
+            println("2 + 7 = ${iadd2(2, 7)}")
+//            println("2 + 8 = ${2.iadd3(8)}")
+            println("2 + 9 = ${iadd3(2, 9)}")
+        }
+
+        subtest("Decorating") {
+            fun log(name: String, op: IntOp): IntOp {
+                return { a, b ->
+                    val r = op(a, b)
+                    println("$a $name $b = $r")
+                    r
+                }
+            }
+
+            log("plus", {a, b -> a + b})(5, 6)
+            log("minus", {a, b -> a - b})(9, 3)
+            log("multiple", {a, b -> a * b})(3, 5)
+            log("divide", {a, b -> a / b})(9, 3)
+        }
+
+    }
 }
 
 typealias IntOp = (Int, Int) -> Int
