@@ -1,7 +1,8 @@
 fun learnBasic() {
 //    learnVariables()
 //    learnBasicStatements()
-    learnFunctions()
+//    learnFunctions()
+    learnLambdas()
 }
 
 
@@ -233,3 +234,47 @@ private fun learnFunctions() {
 
     println("2^8=${2.0 pwr 8}")
 }
+
+
+fun learnLambdas() {
+    println("-- Lambda --")
+
+    val iadd: IntOp = { i0, i1 -> i0 + i1 }
+    val isub: IntOp = fun(i0, i1) = i0 - i1
+//    val imul: IntOp = { i1 -> this * i1}
+
+    println("12 + 5 = ${iadd.invoke(12, 5)}")
+    println("17 - 5 = ${isub(17, 5)}")
+
+    val imul: IntOp2 = { i1 -> this * i1 }
+    val idiv: IntOp2 = fun Int.(i1: Int): Int = this / i1
+
+    println("2 * 5 = ${imul(2, 5)}")
+    println("2 * 3 = ${2.imul(3)}")
+    println("9 / 2 = ${idiv(9, 2)}")
+    println("9 / 3 = ${9.idiv(3)}")
+
+    val iadd2: IntOp2 = iadd
+    val iadd3: IntOp = iadd2
+
+    println("2 + 6 = ${2.iadd2(6)}")
+    println("2 + 7 = ${iadd2(2, 7)}")
+//    println("2 + 8 = ${2.isum3(8)}")
+    println("2 + 9 = ${iadd3(2, 9)}")
+
+    fun log(name: String, op: IntOp): IntOp {
+        return { a, b ->
+            val r = op(a, b)
+            println("$a $name $b = $r")
+            r
+        }
+    }
+
+    log("plus", iadd)(5, 6)
+    log("minus", isub)(9, 3)
+    log("multiple", imul)(3, 5)
+    log("divide", idiv)(9, 3)
+}
+
+typealias IntOp = (Int, Int) -> Int
+typealias IntOp2 = Int.(Int) -> Int
