@@ -1,6 +1,7 @@
 fun learnBasic() {
 //    learnVariables()
-    learnBasicStatements()
+//    learnBasicStatements()
+    learnFunctions()
 }
 
 
@@ -122,4 +123,113 @@ private fun learnBasicStatements() {
     var x2: Double? = 30.0
     x = x2?.let { x2 * 1.5 } ?: x1
     println("x: $x")
+}
+
+
+private fun learnFunctions() {
+    println("-- Functions --")
+
+    // Basic function
+
+    fun isInRange(x: Double?, x0: Double?, x1: Double?): Boolean? {
+        if (x == null) {
+            return null
+        }
+        if (x0 != null && x < x0) {
+            return false
+        }
+        if (x1 != null && x > x1) {
+            return false;
+        }
+        return true;
+    }
+
+    fun testIsInRange(x: Double?, x0: Double?, x1: Double?) {
+        val result = isInRange(x, x0, x1)
+        val resultStr = if (result == true) "is in" else "is not in"
+        val x0Str = if (x0 != null) "[$x0" else "(*"
+        val x1Str = if (x1 != null) "$x1]" else "*)"
+        println("$x $resultStr $x0Str, $x1Str")
+    }
+
+    testIsInRange(5.0, 0.0, 10.0)
+    testIsInRange(5.0, 10.0, 0.0)
+    testIsInRange(15.0, 0.0, 10.0)
+    testIsInRange(null, 0.0, 10.0)
+    testIsInRange(5.0, null, 10.0)
+    testIsInRange(5.0, null, 2.0)
+    testIsInRange(5.0, 0.0, null)
+    testIsInRange(5.0, 7.0, null)
+    testIsInRange(5.0, null, null)
+    testIsInRange(null, null, null)
+
+    println("--")
+
+    // Function with return value instead of body
+
+    fun min(x0: Double, x1: Double): Double = if (x0 < x1) x0 else x1
+
+    println("min of 1 and 5 is ${min(1.0, 5.0)}")
+    println("min of 9 and 5 is ${min(9.0, 5.0)}")
+//    println("min of null and 5 is ${min(null, 5.0)}")    // ILLEGAL: null in non-nullable argument
+
+    println("--")
+
+    // Function with default parameters
+
+    fun rectArea(width: Double, height: Double = width) = width * height
+
+    println("Area of square 10x10 is ${rectArea(10.0)}")
+    println("Area of rectangle 10x20 is ${rectArea(10.0, 20.0)}")
+
+    // Call with named parameters
+    println("Area of rectangle 10x30 is ${rectArea(width = 10.0, 30.0)}")
+    println("Area of rectangle 10x40 is ${rectArea(height = 40.0, width = 10.0)}")
+    println("Area of square 20x20 is ${rectArea(width = 20.0)}")
+
+    println("--")
+
+    // Lambdas
+
+    fun withRectArea(width: Double, height: Double = width, process: (area: Double) -> Unit) {
+        process.invoke(width * height)
+    }
+    fun printArea(name: String): (area: Double) -> Unit {
+        return fun (area: Double) = println("Area of $name is $area")
+    }
+
+    withRectArea(10.0) { println("Area is ___") }
+    withRectArea(20.0, 10.0, fun (area) = println("Area is $area"))
+    withRectArea(30.0, 20.0, printArea("rectangle 30x30"))
+
+    println("--")
+
+    // Varargs
+
+    fun min(vararg values: Double): Double? {
+        if (values.isEmpty()) {
+            return null
+        }
+        var result = values[0]
+        for (v in values) {
+            if (v < result) result = v
+        }
+        return result
+    }
+
+    println("Min of [4.0, 3.0, 2.0] is " + min(4.0, 3.0, 2.0))
+    val values = arrayOf(5.5, 3.7, 8.7, 4.1, 6.6)
+    println("Min of [${values.joinToString(", ")}] is " + min(*values.toDoubleArray()))
+
+    println("--")
+
+    // Infix
+
+    infix fun Double.pwr(p: Int): Double {
+        var r = 1.0
+        for (i in 0 until p) r *= this
+        return r
+    }
+
+    println("2^8=${2.0 pwr 8}")
 }
