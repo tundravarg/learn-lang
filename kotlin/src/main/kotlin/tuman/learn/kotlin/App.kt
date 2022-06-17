@@ -9,13 +9,13 @@ import learnBasic
 
 fun main(args: Array<String>) {
     System.out.println("Learn Kotlin " + (if (args.size > 0) args[0] else ""))
-    learnAccessModifiers()
+//    learnAccessModifiers()
     learnBasic();
 }
 
 
 private fun learnAccessModifiers() {
-    println("-- accessModifiers --")
+    println("-- Access Modifiers --")
 
     defaultFun()
     publicFun()
