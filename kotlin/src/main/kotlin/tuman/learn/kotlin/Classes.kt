@@ -5,7 +5,8 @@ import tuman.learn.kotlin.utils.test
 
 
 fun learnKotlinClasses() {
-    learnBasicClasses()
+//    learnBasicClasses()
+    learnOperatorOverloading()
 }
 
 
@@ -70,5 +71,50 @@ class EditablePoint(override var x: Double, override var y: Double): Point(x, y)
             x *= k
             y *= k
         }
+
+}
+
+
+fun learnOperatorOverloading() {
+    test("Operator Overloading") {
+        var stdio = StdIO()
+        (stdio + "1" + '2' + 3) * "a" + "b" + "c"  // 123 abc
+        stdio++                                    // \n
+        stdio / "asd"                              // asd\n
+        stdio / "qwe"                              // qwe\n
+        stdio / "zxc"                              // zxc\n
+    }
+}
+
+class StdIO() {
+
+    private var newLine = true
+
+    operator fun plus(obj: Any): StdIO {
+        print(obj)
+        newLine = false
+        return this
+    }
+
+    operator fun div(obj: Any): StdIO {
+        println(obj)
+        newLine = true
+        return this
+    }
+
+    operator fun times(obj: Any): StdIO {
+        if (!newLine) {
+            print(" ")
+        }
+        print(obj)
+        newLine = false
+        return this
+    }
+
+    operator fun inc(): StdIO {
+        println()
+        newLine = true
+        return this
+    }
 
 }

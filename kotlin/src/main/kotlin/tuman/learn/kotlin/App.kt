@@ -12,9 +12,9 @@ fun main(args: Array<String>) {
 
 //    learnAccessModifiers()
 //    learnBasic()
-//    learnKotlinClasses()
+    learnKotlinClasses()
 
-    tests()
+//    tests()
 }
 
 
