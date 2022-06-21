@@ -173,6 +173,7 @@ class MyRwSemaphore {
                 }
             }
         }
+        // Synchronized block is necessary here to prevent access collision
         synchronized (readLockers) {
             readLockers.add(Thread.currentThread());
         }
@@ -197,11 +198,13 @@ class MyRwSemaphore {
         if (writeLocker == Thread.currentThread()) {
             writeLocker = null;
         } else {
+            // Synchronized block is necessary here to prevent access collision
             synchronized (readLockers) {
                 readLockers.remove(Thread.currentThread());
             }
         }
         synchronized (this) {
+            // `notifyAll`, not `notify`, because we must awake all readers
             notifyAll();
         }
     }
