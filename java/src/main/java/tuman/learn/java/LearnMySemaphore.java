@@ -7,6 +7,7 @@ import tuman.learn.java.utils.TestRun;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 
 public class LearnMySemaphore {
@@ -24,28 +25,48 @@ public class LearnMySemaphore {
         TestRun.Out fout = TestRun.DecoratedOut.withTimeAndThread(new TestRun.StdOut());
         MySemaphore semaphore = new MySemaphore();
 
-        TestRun.run("My Semaphore", (name, out) -> {
-            executor.execute(() -> {
-                fout.out("Locking semaphore...");
-                semaphore.lock();
-//                semaphore.lock(); // ILLEGAL: semaphore has already been locked by this thread
-                fout.out("Locked semaphore...");
-                MiscUtils.sleep(3.0);
-                fout.out("Unlocking semaphore...");
-                semaphore.unlock();
-                fout.out("Unlocked semaphore...");
-            });
-            executor.execute(() -> {
-                MiscUtils.sleep(0.25);
-                fout.out("Locking semaphore...");
+        class Task implements Runnable {
+            private String name;
+            private double duration;
+
+            public Task(String name, double duration) {
+                this.name = name;
+                this.duration = duration;
+            }
+
+            @Override
+            public void run() {
+//                run1();
+                run2();
+            }
+
+            private void run1() {
+                fout.out("%s: Locking...", name);
 //                semaphore.unlock(); // ILLEGAL: semaphore has not been locked by this thread
                 semaphore.lock();
-                fout.out("Locked semaphore...");
-                MiscUtils.sleep(3.0);
-                fout.out("Unlocking semaphore...");
+//                semaphore.lock(); // ILLEGAL: semaphore has already been locked by this thread
+                fout.out("%s: BEGIN", name);
+                MiscUtils.sleep(duration);
+                fout.out("%s: END", name);
                 semaphore.unlock();
-                fout.out("Unlocked semaphore...");
-            });
+                fout.out("%s: Unlocked", name);
+            }
+
+            private void run2() {
+                fout.out("%s: Locking...", name);
+                semaphore.withLock(() -> {
+                    fout.out("%s: BEGIN", name);
+                    MiscUtils.sleep(duration);
+                    fout.out("%s: END", name);
+                });
+                fout.out("%s: Unlocked", name);
+            }
+        }
+
+        TestRun.run("My Semaphore", (name, out) -> {
+            executor.execute(new Task("Task-1", 3.0));
+            MiscUtils.sleep(1.0);
+            executor.execute(new Task("Task-2", 3.0));
         });
 
         executor.shutdown();
@@ -68,6 +89,11 @@ public class LearnMySemaphore {
 
             @Override
             public void run() {
+//                run1();
+                run2();
+            }
+
+            public void run1() {
                 String action = writer ? "WRITE" : "READ";
                 fout.out("%s: Locking %s...", name, action);
                 if (writer) {
@@ -80,6 +106,20 @@ public class LearnMySemaphore {
                 MiscUtils.sleep(duration);
                 fout.out("%s: End %s", name, action);
                 semaphore.unlock();
+                fout.out(semaphore);
+                fout.out("%s: Unlocked %s", name, action);
+            }
+
+            public void run2() {
+                String action = writer ? "WRITE" : "READ";
+                fout.out("%s: Locking %s...", name, action);
+                Consumer<Runnable> lock = writer ? semaphore::withWriteLock : semaphore::withReadLock;
+                lock.accept(() -> {
+                    fout.out(semaphore);
+                    fout.out("%s: Begin %s", name, action);
+                    MiscUtils.sleep(duration);
+                    fout.out("%s: End %s", name, action);
+                });
                 fout.out(semaphore);
                 fout.out("%s: Unlocked %s", name, action);
             }
@@ -152,6 +192,15 @@ class MySemaphore {
         }
     }
 
+    public void withLock(Runnable run) {
+        try {
+            lock();
+            run.run();
+        } finally {
+            unlock();
+        }
+    }
+
 }
 
 
@@ -209,6 +258,24 @@ class MyRwSemaphore {
         synchronized (this) {
             // `notifyAll`, not `notify`, because we must awake all readers
             notifyAll();
+        }
+    }
+
+    public void withReadLock(Runnable run) {
+        try {
+            lockRead();
+            run.run();
+        } finally {
+            unlock();
+        }
+    }
+
+    public void withWriteLock(Runnable run) {
+        try {
+            lockWrite();
+            run.run();
+        } finally {
+            unlock();
         }
     }
 
