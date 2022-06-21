@@ -85,31 +85,35 @@ public class LearnMySemaphore {
             }
         }
 
-        TestRun.run("My Semaphore", (name, out) -> {
-            List<Task> tasks = Arrays.asList(
-                    new Task("Writer-0", true, 3.0),
-                    new Task("Reader-0", false, 3.0),
-                    new Task("Reader-1", false, 3.0),
-                    new Task("Reader-2", false, 3.0),
-                    new Task("Reader-3", false, 3.0),
-                    new Task("Reader-4", false, 3.0),
-                    new Task("Writer-1", true, 3.0),
-                    new Task("Reader-5", false, 3.0),
-                    new Task("Reader-6", false, 3.0),
-                    new Task("Writer-2", true, 3.0),
-                    new Task("Reader-7", false, 3.0),
-                    new Task("Reader-8", false, 3.0),
-                    new Task("Reader-9", false, 3.0)
-                    );
+        for (int i = 0; i < 100; i++) {
+            TestRun.run("My Semaphore " + i, (name, out) -> {
+                final double DURATION = 0.1;
+                final double PAUSE = 0.01;
+                List<Task> tasks = Arrays.asList(
+                        new Task("Writer-0", true,  DURATION),
+                        new Task("Reader-0", false, DURATION),
+                        new Task("Reader-1", false, DURATION),
+                        new Task("Reader-2", false, DURATION),
+                        new Task("Reader-3", false, DURATION),
+                        new Task("Reader-4", false, DURATION),
+                        new Task("Writer-1", true,  DURATION),
+                        new Task("Reader-5", false, DURATION),
+                        new Task("Reader-6", false, DURATION),
+                        new Task("Writer-2", true,  DURATION),
+                        new Task("Reader-7", false, DURATION),
+                        new Task("Reader-8", false, DURATION),
+                        new Task("Reader-9", false, DURATION)
+                );
 //            Collections.shuffle(tasks);
 
-            ExecutorService executor = Executors.newCachedThreadPool();
-            for (Task task: tasks) {
-                executor.execute(task);
-                MiscUtils.sleep(0.25);
-            }
-            MiscUtils.shutdownAndAwaitTermination(executor);
-        });
+                ExecutorService executor = Executors.newCachedThreadPool();
+                for (Task task : tasks) {
+                    executor.execute(task);
+                    MiscUtils.sleep(PAUSE);
+                }
+                MiscUtils.shutdownAndAwaitTermination(executor);
+            });
+        }
     }
 
 }
@@ -169,7 +173,9 @@ class MyRwSemaphore {
                 }
             }
         }
-        readLockers.add(Thread.currentThread());
+        synchronized (readLockers) {
+            readLockers.add(Thread.currentThread());
+        }
     }
 
     public void lockWrite() {
@@ -191,7 +197,9 @@ class MyRwSemaphore {
         if (writeLocker == Thread.currentThread()) {
             writeLocker = null;
         } else {
-            readLockers.remove(Thread.currentThread());
+            synchronized (readLockers) {
+                readLockers.remove(Thread.currentThread());
+            }
         }
         synchronized (this) {
             notifyAll();
