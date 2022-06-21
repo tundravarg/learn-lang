@@ -69,7 +69,7 @@ public class LearnMySemaphore {
             @Override
             public void run() {
                 String action = writer ? "WRITE" : "READ";
-//                fout.out("%s: Locking %s...", name, action);
+                fout.out("%s: Locking %s...", name, action);
                 if (writer) {
                     semaphore.lockWrite();
                 } else {
@@ -81,14 +81,14 @@ public class LearnMySemaphore {
                 fout.out("%s: End %s", name, action);
                 semaphore.unlock();
                 fout.out(semaphore);
-//                fout.out("%s: Unlocked %s", name, action);
+                fout.out("%s: Unlocked %s", name, action);
             }
         }
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             TestRun.run("My Semaphore " + i, (name, out) -> {
-                final double DURATION = 0.1;
-                final double PAUSE = 0.01;
+                final double DURATION = 3.0;
+                final double PAUSE = 2.0;
                 List<Task> tasks = Arrays.asList(
                         new Task("Writer-0", true,  DURATION),
                         new Task("Reader-0", false, DURATION),
@@ -160,11 +160,12 @@ class MyRwSemaphore {
 
     private Set<Thread> readLockers = new HashSet<>();
     private Thread writeLocker = null;
+    private int numberOfWriteLockers = 0;
 
 
     public void lockRead() {
         checkLockedByCurrentThread(false);
-        while (writeLocker != null) {
+        while (writeLocker != null || numberOfWriteLockers > 0) {
             synchronized (this) {
                 try {
                     wait();
@@ -181,6 +182,7 @@ class MyRwSemaphore {
 
     public void lockWrite() {
         checkLockedByCurrentThread(false);
+        numberOfWriteLockers++;
         while (writeLocker != null || !readLockers.isEmpty()) {
             synchronized (this) {
                 try {
@@ -197,6 +199,7 @@ class MyRwSemaphore {
         checkLockedByCurrentThread(true);
         if (writeLocker == Thread.currentThread()) {
             writeLocker = null;
+            numberOfWriteLockers--;
         } else {
             // Synchronized block is necessary here to prevent access collision
             synchronized (readLockers) {
