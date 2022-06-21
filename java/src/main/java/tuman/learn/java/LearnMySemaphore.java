@@ -24,6 +24,7 @@ public class LearnMySemaphore {
             executor.execute(() -> {
                 fout.out("Locking semaphore...");
                 semaphore.lock();
+//                semaphore.lock(); // ILLEGAL: semaphore has already been locked by this thread
                 fout.out("Locked semaphore...");
                 MiscUtils.sleep(3.0);
                 fout.out("Unlocking semaphore...");
@@ -33,6 +34,7 @@ public class LearnMySemaphore {
             executor.execute(() -> {
                 MiscUtils.sleep(0.25);
                 fout.out("Locking semaphore...");
+//                semaphore.unlock(); // ILLEGAL: semaphore has not been locked by this thread
                 semaphore.lock();
                 fout.out("Locked semaphore...");
                 MiscUtils.sleep(3.0);
@@ -51,10 +53,14 @@ public class LearnMySemaphore {
 
 class MySemaphore {
 
-    boolean locked;
+    private Thread lockingThread;
 
     public void lock() {
-        while (locked) {
+        Thread thread = Thread.currentThread();
+        if (lockingThread == thread) {
+            throw new IllegalStateException("Semaphore has already been locked by this thread: " + thread.getName());
+        }
+        while (lockingThread != null) {
             try {
                 synchronized (this) {
                     wait();
@@ -63,11 +69,15 @@ class MySemaphore {
                 return;
             }
         }
-        locked = true;
+        lockingThread = thread;
     }
 
     public void unlock() {
-        locked = false;
+        Thread thread = Thread.currentThread();
+        if (lockingThread != thread) {
+            throw new IllegalStateException("Semaphore has not been locked by this thread: " + thread.getName());
+        }
+        lockingThread = null;
         synchronized (this) {
             notify();
         }
